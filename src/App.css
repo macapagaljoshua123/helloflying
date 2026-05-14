@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+:root {
+  --sky-deep: #0a1628;
+  --sky-mid: #0f2040;
+  --sky-blue: #1a3a6b;
+  --sky-bright: #2563eb;
+  --sky-light: #60a5fa;
+  --sky-pale: #dbeafe;
+  --gold: #f59e0b;
+  --gold-light: #fcd34d;
+  --cloud: #f0f7ff;
+  --text-primary: #ffffff;
+  --text-muted: rgba(255,255,255,0.6);
+  --text-dark: #0a1628;
+  --card-bg: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.1);
+  --radius: 16px;
+  --radius-sm: 8px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--sky-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Syne', sans-serif;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+input, select {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--sky-mid);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--sky-blue);
+  border-radius: 3px;
+}
