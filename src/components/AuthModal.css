@@ -220,3 +220,427 @@
 .auth-switch-link:hover {
     text-decoration: underline;
 }
+
+/* ==========================================
+   PREMIUM SIGN-IN & LOG-IN ANIMATIONS (THEMED)
+   ========================================== */
+
+/* Animation State Transitions for AuthModal */
+.auth-modal {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-modal.animating-loading {
+    max-width: 400px;
+    padding: 2.5rem 2rem;
+    background: linear-gradient(135deg, rgba(13, 18, 36, 0.98) 0%, rgba(7, 10, 20, 0.98) 100%);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 50px rgba(37, 99, 235, 0.2);
+}
+
+.auth-modal.animating-success {
+    max-width: 440px;
+    padding: 2.5rem 2rem;
+    background: linear-gradient(135deg, rgba(10, 25, 20, 0.98) 0%, rgba(5, 12, 10, 0.98) 100%);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 50px rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+/* Radar Loading Animation */
+.auth-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.airport-radar {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    background: rgba(37, 99, 235, 0.03);
+    border-radius: 50%;
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.radar-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed rgba(37, 99, 235, 0.12);
+}
+
+.radar-circle.ring-1 {
+    width: 50px;
+    height: 50px;
+}
+
+.radar-circle.ring-2 {
+    width: 100px;
+    height: 100px;
+}
+
+.radar-circle.ring-3 {
+    width: 150px;
+    height: 150px;
+}
+
+.radar-sweep {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background: linear-gradient(45deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0) 70%);
+    top: 0;
+    right: 0;
+    transform-origin: bottom left;
+    animation: rotateSweep 2s linear infinite;
+    border-right: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.radar-plane-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    animation: rotatePlane 8s linear infinite;
+}
+
+.radar-plane {
+    position: absolute;
+    top: 20px;
+    left: 80px;
+    color: #3b82f6;
+    transform: rotate(45deg);
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.8));
+    animation: pulsePlane 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes rotateSweep {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes rotatePlane {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulsePlane {
+    from { transform: rotate(45deg) scale(0.9); opacity: 0.7; }
+    to { transform: rotate(45deg) scale(1.1); opacity: 1; filter: drop-shadow(0 0 12px rgba(59, 130, 246, 1)); }
+}
+
+.loading-status {
+    text-align: center;
+    width: 100%;
+}
+
+.loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 0.75rem;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    animation: bounceDot 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounceDot {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+.loading-status-text {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    min-height: 1.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Success Animations */
+.auth-success-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    animation: fadeIn 0.5s ease-out forwards;
+    overflow: hidden;
+}
+
+/* Confetti Effect */
+.confetti-effect {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.confetti-piece.piece-0 { left: 10%; top: -10px; background: #10b981; animation: fallConfetti 2s 0.1s infinite ease-in; }
+.confetti-piece.piece-1 { left: 20%; top: -10px; background: #60a5fa; animation: fallConfetti 1.8s 0.3s infinite ease-in; }
+.confetti-piece.piece-2 { left: 35%; top: -10px; background: #fbbf24; animation: fallConfetti 2.2s 0s infinite ease-in; }
+.confetti-piece.piece-3 { left: 50%; top: -10px; background: #f87171; animation: fallConfetti 1.9s 0.5s infinite ease-in; }
+.confetti-piece.piece-4 { left: 65%; top: -10px; background: #34d399; animation: fallConfetti 2.1s 0.2s infinite ease-in; }
+.confetti-piece.piece-5 { left: 80%; top: -10px; background: #a78bfa; animation: fallConfetti 1.7s 0.4s infinite ease-in; }
+.confetti-piece.piece-6 { left: 90%; top: -10px; background: #f472b6; animation: fallConfetti 2s 0.15s infinite ease-in; }
+.confetti-piece.piece-7 { left: 15%; top: -10px; background: #fbbf24; animation: fallConfetti 2.3s 0.6s infinite ease-in; }
+.confetti-piece.piece-8 { left: 40%; top: -10px; background: #60a5fa; animation: fallConfetti 1.6s 0.25s infinite ease-in; }
+.confetti-piece.piece-9 { left: 75%; top: -10px; background: #10b981; animation: fallConfetti 2.1s 0.7s infinite ease-in; }
+
+@keyframes fallConfetti {
+    0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+    100% { transform: translateY(300px) rotate(360deg) scale(0.4); opacity: 0; }
+}
+
+/* Success Checkmark Circle */
+.success-stamp-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.success-checkmark-circle {
+    width: 68px;
+    height: 68px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 2px solid #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #10b981;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    animation: popCheckmark 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.checkmark-icon {
+    animation: strokeCheck 0.4s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes popCheckmark {
+    from { transform: scale(0); box-shadow: 0 0 0 rgba(16, 185, 129, 0); }
+    to { transform: scale(1); box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
+}
+
+@keyframes strokeCheck {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Boarding Pass Ticket Design */
+.boarding-pass-ticket {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 1.25rem;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02), 0 10px 30px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    animation: slideDownTicket 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+/* Left & Right Ticket Cutouts */
+.boarding-pass-ticket::before,
+.boarding-pass-ticket::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #0a0f1c; /* Modal backdrop color to make cutout look transparent */
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.boarding-pass-ticket::before {
+    left: -11px;
+}
+
+.boarding-pass-ticket::after {
+    right: -11px;
+}
+
+@keyframes slideDownTicket {
+    from { transform: translateY(-30px); opacity: 0; filter: blur(5px); }
+    to { transform: translateY(0); opacity: 1; filter: blur(0); }
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.ticket-logo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #60a5fa;
+    font-size: 0.85rem;
+}
+
+.ticket-logo-icon {
+    transform: rotate(45deg);
+}
+
+.ticket-logo span strong {
+    color: #fff;
+    font-weight: 700;
+}
+
+.ticket-pass-type {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.1em;
+}
+
+.ticket-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.ticket-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.ticket-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.ticket-col.seat-col {
+    text-align: right;
+    align-items: flex-end;
+}
+
+.col-label {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.col-value {
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+.col-value.name-value {
+    color: #fbcfe8; /* Soft pink-white accent */
+    text-transform: capitalize;
+}
+
+.col-value.seat-value {
+    color: #fbbf24; /* Golden seat accent */
+    font-weight: 800;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.status-approved {
+    color: #34d399 !important;
+    font-weight: 700;
+}
+
+.ticket-barcode-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 1px dashed rgba(255, 255, 255, 0.15);
+    margin-top: 0.85rem;
+    padding-top: 0.75rem;
+}
+
+.ticket-barcode {
+    display: flex;
+    height: 28px;
+    background: transparent;
+    padding: 0 10px;
+    opacity: 0.8;
+}
+
+.barcode-line {
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.barcode-number {
+    font-family: monospace;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
+    letter-spacing: 0.25em;
+}
+
+.success-welcome-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    margin-bottom: 0.25rem;
+    text-align: center;
+    animation: fadeIn 0.4s ease-out 0.4s both;
+}
+
+.success-welcome-sub {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    animation: fadeIn 0.4s ease-out 0.6s both;
+}
+
+/* Shake Animation for Errors */
+.animate-shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

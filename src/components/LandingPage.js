@@ -77,6 +77,7 @@ export default function LandingPage({ onSearch, error }) {
       return null;
     }
   });
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     fetch('/api/routes/popular')
@@ -157,7 +158,11 @@ export default function LandingPage({ onSearch, error }) {
   };
 
   const handleLogout = () => {
-    setUser(null);
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      setUser(null);
+      setIsLoggingOut(false);
+    }, 2200);
   };
 
   const handleSelectSavedSearch = (search) => {
@@ -662,6 +667,32 @@ export default function LandingPage({ onSearch, error }) {
         onClose={() => setShowSavedSearches(false)}
         onSelectSearch={handleSelectSavedSearch}
       />
+
+      {/* Fullscreen Sign Out Overlay */}
+      {isLoggingOut && (
+        <div className="signout-overlay">
+          <div className="signout-stars">
+            {[...Array(20)].map((_, i) => (
+              <div key={i} className={`signout-star star-${i}`} />
+            ))}
+          </div>
+          
+          <div className="signout-container">
+            <div className="signout-plane-glow-wrapper">
+              <div className="signout-plane-track">
+                <Plane className="signout-plane-icon" size={64} />
+              </div>
+            </div>
+            
+            <h2 className="signout-title">Signing Out</h2>
+            <p className="signout-subtitle">Preparing your next adventure. See you soon!</p>
+            
+            <div className="signout-loader-bar">
+              <div className="signout-loader-fill" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
