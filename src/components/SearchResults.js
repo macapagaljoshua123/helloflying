@@ -230,7 +230,7 @@ function DataPipelinePanel({ results }) {
 }
 
 /* ─── FLIGHT CARD ─────────────────────────────────────────────────────────── */
-function FlightCard({ flight, index, onSaveFlight }) {
+function FlightCard({ flight, index, onSaveFlight, searchParams }) {
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -252,7 +252,8 @@ function FlightCard({ flight, index, onSaveFlight }) {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          flight: flight
+          flight: flight,
+          search_params: searchParams
         })
       });
 
@@ -399,9 +400,6 @@ export default function SearchResults({ results, params, loading, error, onReset
     setSaveMessage('');
 
     try {
-      console.log('Saving search with params:', params);
-      console.log('Token:', token);
-
       const response = await fetch(`${API_URL}/api/save-search-results`, {
         method: 'POST',
         headers: {
@@ -425,11 +423,9 @@ export default function SearchResults({ results, params, loading, error, onReset
         })
       });
 
-      const data = await response.json();
-      console.log('Response:', data);
-
       if (!response.ok) {
-        throw new Error(data.detail || 'Failed to save');
+        const errData = await response.json();
+        throw new Error(errData.detail || 'Failed to save');
       }
 
       setSaveMessage('Search saved successfully!');
@@ -610,7 +606,13 @@ export default function SearchResults({ results, params, loading, error, onReset
             </div>
 
             {flights.map((flight, i) => (
-              <FlightCard key={flight.id || i} flight={flight} index={i} onSaveFlight={saveCurrentSearch} />
+              <FlightCard 
+                key={flight.id || i} 
+                flight={flight} 
+                index={i} 
+                onSaveFlight={saveCurrentSearch} 
+                searchParams={params}
+              />
             ))}
           </div>
         </div>

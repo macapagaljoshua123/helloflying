@@ -14,6 +14,7 @@ import asyncio
 import sys
 import os
 from datetime import datetime, date, timedelta
+from fastapi import FastAPI, Query, HTTPException, BackgroundTasks, Depends, Request
 
 # Auth imports
 from auth_routes import router as auth_router, get_current_user
@@ -102,7 +103,7 @@ def validate_date(d: str, field: str) -> str:
 # Add this after the other routes
 @app.post("/api/save-flight")
 async def save_single_flight(
-    flight: dict,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -110,16 +111,27 @@ async def save_single_flight(
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    # Create a saved search entry for this flight
+    body = await request.json()
+    flight = body.get("flight", {})
+    search_params = body.get("search_params", {})
+    
+    # Fallback to check if body itself is the flight
+    if not flight and "airline" in body:
+        flight = body
+        
+    print(f"Saving single flight for user {current_user.id}")
+    print(f"Flight: {flight}")
+    print(f"Search params: {search_params}")
+    
     saved_search = SavedSearch(
         user_id=current_user.id,
         name=f"{flight.get('airline', 'Flight')} - {flight.get('origin', '')} to {flight.get('destination', '')}",
-        origin=flight.get("origin", ""),
-        destination=flight.get("destination", ""),
-        departure_date="",  # Will be updated from search params if needed
-        return_date="",
-        passengers=1,
-        cabin_class=flight.get("cabin_class", "Economy"),
+        origin=flight.get("origin") or search_params.get("origin") or "",
+        destination=flight.get("destination") or search_params.get("destination") or "",
+        departure_date=search_params.get("date") or flight.get("departure_date") or "",
+        return_date=search_params.get("return_date") or search_params.get("returnDate") or "",
+        passengers=search_params.get("passengers") or 1,
+        cabin_class=flight.get("cabin_class") or search_params.get("cabin_class") or "Economy",
         saved_price=flight.get("price", 0),
         saved_flight_data=flight
     )
@@ -156,8 +168,7 @@ async def log_activity(
 
 @app.post("/api/save-search-results")
 async def save_search_results(
-    search_params: dict,
-    results: dict,
+    request: Request,  # Add this import: from fastapi import Request
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -165,21 +176,42 @@ async def save_search_results(
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    # Create a saved search entry
+    # Get the JSON body
+    body = await request.json()
+    search_params = body.get("search_params", {})
+    results = body.get("results", {})
+    
+    print(f"Saving search for user {current_user.id}")
+    print(f"Search params: {search_params}")
+    
+    # Get the cheapest flight price if available
+    flights = results.get("flights", [])
+    cheapest_price = flights[0].get("price") if flights else None
+    
+    # Create a saved search entry with ALL the data
     saved_search = SavedSearch(
         user_id=current_user.id,
+        name=f"{search_params.get('origin', '')} to {search_params.get('destination', '')}",
         origin=search_params.get("origin", ""),
         destination=search_params.get("destination", ""),
         departure_date=search_params.get("date", ""),
         return_date=search_params.get("return_date", ""),
         passengers=search_params.get("passengers", 1),
         cabin_class=search_params.get("cabin_class", "Economy"),
-        saved_price=results.get("flights", [{}])[0].get("price") if results.get("flights") else None,
-        saved_flight_data=results
+        saved_price=cheapest_price,
+        saved_flight_data={
+            "flights": flights[:5],  # Save top 5 flights
+            "total": results.get("total", 0),
+            "scraped_at": results.get("scraped_at", "")
+        }
     )
     
     db.add(saved_search)
     db.commit()
+    db.refresh(saved_search)
+    
+    print(f"Saved search ID: {saved_search.id}")
+    print(f"Origin: {saved_search.origin}, Destination: {saved_search.destination}")
     
     return {"message": "Search results saved", "search_id": saved_search.id}
 
