@@ -50,6 +50,32 @@ export default function LandingPage({ onSearch, error }) {
   });
   const [formError, setFormError] = useState('');
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [popularRoutes, setPopularRoutes] = useState(POPULAR_ROUTES);
+  const [activeInsightRoute, setActiveInsightRoute] = useState(null);
+  const [trackedRoutes, setTrackedRoutes] = useState(() => {
+    try {
+      const saved = localStorage.getItem('tracked_routes');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    fetch('/api/routes/popular')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch popular routes');
+        return res.json();
+      })
+      .then(data => {
+        if (data && data.routes) {
+          setPopularRoutes(data.routes);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching popular routes:', err);
+      });
+  }, []);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -101,8 +127,26 @@ export default function LandingPage({ onSearch, error }) {
   };
 
   const handleQuickRoute = (route) => {
-    setForm(prev => ({ ...prev, origin: route.from, destination: route.to }));
+    setForm(prev => ({ 
+      ...prev, 
+      origin: route.from, 
+      destination: route.to,
+      date: route.departure_date || today
+    }));
     document.getElementById('date-input')?.focus();
+  };
+
+  const generateSvgPath = (points) => {
+    if (!points || points.length === 0) return '';
+    const prices = points.map(p => p.price);
+    const minP = Math.min(...prices) * 0.9;
+    const maxP = Math.max(...prices) * 1.1;
+    
+    return points.map((pt, idx) => {
+      const x = (idx / (points.length - 1)) * 500;
+      const y = 120 - ((pt.price - minP) / (maxP - minP || 1)) * 90;
+      return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
+    }).join(' ');
   };
 
   return (
@@ -337,12 +381,19 @@ export default function LandingPage({ onSearch, error }) {
       {/* Quick Routes */}
       <section id="routes" className="popular-routes">
         <h2>Popular Routes</h2>
-        <p className="section-sub">Click to pre-fill your search</p>
+        <p className="section-sub">Click a route for Live Insights & Price Tracking</p>
         <div className="routes-grid">
-          {POPULAR_ROUTES.map((route, i) => (
-            <button key={i} className="route-card" onClick={() => handleQuickRoute(route)}>
+          {popularRoutes.map((route, i) => (
+            <button key={i} className="route-card" onClick={() => setActiveInsightRoute(route)}>
               <div className="route-label">{route.label}</div>
-              <div className="route-price">from {route.price}</div>
+              <div className="route-price">
+                from {route.price}
+                {route.is_live && (
+                  <span className="live-badge" title="Verified live price from Google Flights">
+                    <span className="live-dot" /> Live
+                  </span>
+                )}
+              </div>
               <div className="route-arrow"><ArrowRight size={20} /></div>
             </button>
           ))}
@@ -379,6 +430,193 @@ export default function LandingPage({ onSearch, error }) {
           <a href="#contact">Contact</a>
         </div>
       </footer>
+
+      {/* Popular Route Insights & Price Tracking Modal */}
+      {activeInsightRoute && (
+        <div className="insight-modal-overlay" onClick={() => setActiveInsightRoute(null)}>
+          <div className="insight-modal-content" onClick={e => e.stopPropagation()}>
+            <button className="insight-modal-close" onClick={() => setActiveInsightRoute(null)}>
+              &times;
+            </button>
+            
+            <div className="insight-modal-header">
+              <h3>{activeInsightRoute.label}</h3>
+              <p className="insight-subtitle">Live Flight Insights & Price Tracking</p>
+            </div>
+            
+            <div className="insight-modal-body">
+              {/* Tracker Toggle Section */}
+              <div className="tracker-toggle-card">
+                <div className="tracker-info">
+                  <div className="tracker-title">Track prices</div>
+                  <div className="tracker-desc">
+                    {activeInsightRoute.departure_date 
+                      ? `For departure on ${new Date(activeInsightRoute.departure_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                      : 'For upcoming flight dates'}
+                  </div>
+                </div>
+                <label className="switch">
+                  <input 
+                    type="checkbox" 
+                    checked={!!trackedRoutes[`${activeInsightRoute.from}-${activeInsightRoute.to}`]} 
+                    onChange={(e) => {
+                      const key = `${activeInsightRoute.from}-${activeInsightRoute.to}`;
+                      const updated = { ...trackedRoutes, [key]: e.target.checked };
+                      setTrackedRoutes(updated);
+                      localStorage.setItem('tracked_routes', JSON.stringify(updated));
+                    }}
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </div>
+
+              {trackedRoutes[`${activeInsightRoute.from}-${activeInsightRoute.to}`] && (
+                <div className="tracker-alert">
+                  <AlertCircle size={16} />
+                  <span>Price tracking is now active! We'll alert you if prices drop below {activeInsightRoute.price}.</span>
+                </div>
+              )}
+
+              {/* Price Trend Banner */}
+              <div className={`price-trend-banner ${activeInsightRoute.price_trend || 'typical'}`}>
+                <div className="trend-icon-wrapper">
+                  <DollarSign size={20} />
+                </div>
+                <div className="trend-details">
+                  <div className="trend-status">
+                    Prices are currently <strong>{(activeInsightRoute.price_trend || 'typical').toUpperCase()}</strong>
+                  </div>
+                  <p className="trend-desc">
+                    {activeInsightRoute.price_trend === 'high' 
+                      ? `Fares are currently higher than usual for this route. We suggest tracking or waiting to book.`
+                      : activeInsightRoute.price_trend === 'low'
+                      ? `Fares are currently lower than usual! This is an excellent time to lock in your flight.`
+                      : `Fares are typical for these dates. Prices are stable and ready for booking.`}
+                  </p>
+                </div>
+              </div>
+
+              {/* Price History SVG Graph */}
+              {activeInsightRoute.price_history && activeInsightRoute.price_history.length > 0 && (
+                <div className="price-history-section">
+                  <h4>30-Day Price Trend</h4>
+                  <div className="price-history-chart">
+                    {/* SVG Line Chart */}
+                    <svg viewBox="0 0 500 150" className="chart-svg">
+                      <defs>
+                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                          <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Grid Lines */}
+                      <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(255,255,255,0.05)" />
+                      <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(255,255,255,0.05)" />
+                      <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.05)" />
+
+                      {/* Line Path */}
+                      <path 
+                        d={generateSvgPath(activeInsightRoute.price_history)} 
+                        fill="none" 
+                        stroke="#10b981" 
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Gradient Fill Path */}
+                      <path 
+                        d={`${generateSvgPath(activeInsightRoute.price_history)} L 500 150 L 0 150 Z`} 
+                        fill="url(#chartGrad)" 
+                      />
+
+                      {/* Chart dots */}
+                      {activeInsightRoute.price_history.map((pt, idx) => {
+                        const x = (idx / (activeInsightRoute.price_history.length - 1)) * 500;
+                        const prices = activeInsightRoute.price_history.map(p => p.price);
+                        const minP = Math.min(...prices) * 0.9;
+                        const maxP = Math.max(...prices) * 1.1;
+                        const y = 120 - ((pt.price - minP) / (maxP - minP || 1)) * 90;
+                        return (
+                          <g key={idx} className="chart-dot-group">
+                            <circle cx={x} cy={y} r="5" fill="#10b981" stroke="#0f172a" strokeWidth="2" />
+                            <text x={x} y={y - 12} className="chart-tooltip-text" textAnchor="middle">
+                              ${pt.price}
+                            </text>
+                            <text x={x} y="145" className="chart-axis-text" textAnchor="middle">
+                              {pt.date}
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                </div>
+              )}
+
+              {/* Airline Price Comparison */}
+              <div className="airlines-comparison-section">
+                <h4>Cheapest Airline Fares</h4>
+                <div className="airlines-list">
+                  {activeInsightRoute.airline_breakdown && activeInsightRoute.airline_breakdown.length > 0 ? (
+                    activeInsightRoute.airline_breakdown.map((item, idx) => (
+                      <div key={idx} className="airline-price-item">
+                        <div className="airline-name-wrapper">
+                          <Plane size={16} className="airline-icon" />
+                          <span className="airline-name">{item.airline}</span>
+                        </div>
+                        <div className="airline-price-action">
+                          <span className="airline-price-val">{item.price}</span>
+                          <button 
+                            className="btn-select-airline"
+                            onClick={() => {
+                              handleQuickRoute(activeInsightRoute);
+                              setActiveInsightRoute(null);
+                            }}
+                          >
+                            Select
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="airline-price-item">
+                      <div className="airline-name-wrapper">
+                        <Plane size={16} className="airline-icon" />
+                        <span className="airline-name">Google Flights Cheapest Fare</span>
+                      </div>
+                      <div className="airline-price-action">
+                        <span className="airline-price-val">{activeInsightRoute.price}</span>
+                        <button 
+                          className="btn-select-airline"
+                          onClick={() => {
+                            handleQuickRoute(activeInsightRoute);
+                            setActiveInsightRoute(null);
+                          }}
+                        >
+                          Select
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="insight-modal-footer">
+              <button 
+                className="btn-search-route-full" 
+                onClick={() => {
+                  handleQuickRoute(activeInsightRoute);
+                  setActiveInsightRoute(null);
+                }}
+              >
+                Search Flights for this Route
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

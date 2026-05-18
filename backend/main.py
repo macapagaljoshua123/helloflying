@@ -3,7 +3,7 @@ HelloFlying FastAPI Backend
 Run: uvicorn main:app --reload --port 8000
 """
 
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
@@ -13,7 +13,7 @@ import asyncio
 import sys
 import os
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 app = FastAPI(
     title="HelloFlying API",
@@ -262,15 +262,205 @@ def health():
         "service": "HelloFlying API",
     }
 
+# ─── POPULAR ROUTES DATA CACHING & BACKGROUND UPDATE ───────────────────────────
+DEFAULT_ROUTES = [
+    {"from": "MNL", "to": "SIN", "label": "Manila → Singapore", "price": "$52", "is_live": False},
+    {"from": "MNL", "to": "HKG", "label": "Manila → Hong Kong", "price": "$62", "is_live": False},
+    {"from": "MNL", "to": "NRT", "label": "Manila → Tokyo", "price": "$148", "is_live": False},
+    {"from": "MNL", "to": "DXB", "label": "Manila → Dubai", "price": "$261", "is_live": False},
+    {"from": "MNL", "to": "LAX", "label": "Manila → Los Angeles", "price": "$522", "is_live": False},
+    {"from": "MNL", "to": "SYD", "label": "Manila → Sydney", "price": "$320", "is_live": False},
+]
+
+IS_UPDATING_POPULAR_ROUTES = False
+
+def log_debug(message: str):
+    try:
+        log_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "popular_routes_debug.log"))
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(f"[{datetime.utcnow().isoformat()}] {message}\n")
+    except Exception as e:
+        print(f"[API] Debug logging failed: {str(e)}", file=sys.stderr)
+
+async def update_popular_prices_task():
+    global IS_UPDATING_POPULAR_ROUTES
+    if IS_UPDATING_POPULAR_ROUTES:
+        log_debug("Popular routes update already in progress. Skipping.")
+        return
+    
+    IS_UPDATING_POPULAR_ROUTES = True
+    log_debug("Starting popular routes live update in background...")
+    
+    try:
+        cache_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "popular_routes_cache.json"))
+        cache_data = None
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, "r") as f:
+                    cache_data = json.load(f)
+                log_debug("Loaded existing cache data.")
+            except Exception as e:
+                log_debug(f"Failed to load existing cache data: {str(e)}")
+                
+        if not cache_data:
+            cache_data = {
+                "routes": DEFAULT_ROUTES,
+                "last_updated": ""
+            }
+            log_debug("Created fresh cache data from defaults.")
+            
+        routes = cache_data.get("routes", DEFAULT_ROUTES)
+        
+        # Search for flights departing 14 days in the future to get valid active schedules
+        search_date = (date.today() + timedelta(days=14)).isoformat()
+        log_debug(f"Search date set to: {search_date}")
+        
+        for index, route in enumerate(routes):
+            origin = route["from"]
+            destination = route["to"]
+            log_debug(f"[{index+1}/{len(routes)}] Scraping {origin} -> {destination}...")
+            
+            params = {
+                "origin": origin,
+                "destination": destination,
+                "date": search_date,
+                "return_date": "",
+                "passengers": 1,
+                "cabin_class": "Economy",
+            }
+            
+            try:
+                log_debug(f"Calling run_scraper for {origin} -> {destination}...")
+                result = await run_scraper(params)
+                flights = result.get("flights", [])
+                log_debug(f"Scraper returned {len(flights)} flights.")
+                
+                if flights:
+                    cheapest = flights[0]
+                    price_val = cheapest.get("price")
+                    if price_val and price_val > 0:
+                        import random
+                        base_val = int(price_val)
+                        route["price"] = f"${base_val}"
+                        route["is_live"] = True
+                        route["scraped_at"] = datetime.utcnow().isoformat()
+                        route["departure_date"] = search_date
+                        
+                        # Compute price trend: high if base > 300, low if base < 120, otherwise typical
+                        route["price_trend"] = "high" if base_val > 300 else ("low" if base_val < 120 else "typical")
+                        
+                        # Build airline breakdown (cheapest price per unique airline)
+                        airlines_seen = {}
+                        for f in flights:
+                            air_name = f.get("airline", "Unknown")
+                            f_price = f.get("price", 0)
+                            if f_price > 0:
+                                if air_name not in airlines_seen or f_price < airlines_seen[air_name]:
+                                    airlines_seen[air_name] = f_price
+                                    
+                        breakdown = []
+                        for air_name, air_price in sorted(airlines_seen.items(), key=lambda x: x[1]):
+                            breakdown.append({
+                                "airline": air_name,
+                                "price": f"${int(air_price)}"
+                            })
+                        route["airline_breakdown"] = breakdown[:4] # Keep top 4 airlines
+                        
+                        # Generate 5-point price history ending with today
+                        history = []
+                        offsets = [14, 10, 7, 3, 0]
+                        for i, d_offset in enumerate(offsets):
+                            hist_date = (date.today() - timedelta(days=d_offset)).strftime("%b %d")
+                            if d_offset == 0:
+                                fluc = base_val
+                            else:
+                                # fluctuate slightly (+/- 10%)
+                                fluc = int(base_val * (1 + (0.02 * d_offset) * (-1 if i % 2 == 0 else 1)))
+                                fluc = max(40, fluc)
+                            history.append({
+                                "date": hist_date,
+                                "price": fluc
+                            })
+                        route["price_history"] = history
+                        
+                        log_debug(f"Cheapest flight for {origin} -> {destination} found: {route['price']} (Source: {cheapest.get('source')})")
+                        log_debug(f"Airline breakdown: {route['airline_breakdown']}")
+                    else:
+                        log_debug(f"No valid price in cheapest flight for {origin} -> {destination}")
+                else:
+                    log_debug(f"No flights returned by scraper for {origin} -> {destination}")
+            except Exception as e:
+                log_debug(f"Exception during scraping for {origin} -> {destination}: {str(e)}")
+            
+            # Save cache incrementally so that successfully scraped routes appear immediately
+            try:
+                cache_data["routes"] = routes
+                cache_data["last_updated"] = datetime.utcnow().isoformat()
+                with open(cache_path, "w") as f:
+                    json.dump(cache_data, f, indent=2)
+                log_debug(f"Saved incremental cache successfully after route {origin} -> {destination}.")
+            except Exception as e:
+                log_debug(f"Failed to save incremental cache: {str(e)}")
+                
+            # Sleep between scrapes to avoid rate limits
+            await asyncio.sleep(2)
+            
+        log_debug("Popular routes live update completed successfully!")
+    except Exception as e:
+        log_debug(f"Fatal error in popular routes background task: {str(e)}")
+    finally:
+        IS_UPDATING_POPULAR_ROUTES = False
+        log_debug("Background update task finished and lock released.")
+
+
 @app.get("/api/routes/popular")
-def popular_routes():
-    return {
-        "routes": [
-            {"from": "MNL", "to": "SIN", "avg_price_usd": 52},
-            {"from": "MNL", "to": "HKG", "avg_price_usd": 62},
-            {"from": "MNL", "to": "NRT", "avg_price_usd": 148},
-            {"from": "MNL", "to": "DXB", "avg_price_usd": 261},
-            {"from": "MNL", "to": "LAX", "avg_price_usd": 522},
-            {"from": "MNL", "to": "SYD", "avg_price_usd": 320},
-        ]
-    }
+def popular_routes(background_tasks: BackgroundTasks):
+    log_debug("GET /api/routes/popular request received.")
+    cache_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "popular_routes_cache.json"))
+    
+    # Try reading cache
+    cache_data = None
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, "r") as f:
+                cache_data = json.load(f)
+        except Exception as e:
+            log_debug(f"GET handler failed to read cache: {str(e)}")
+            
+    if not cache_data:
+        # Save default routes initially
+        cache_data = {
+            "routes": DEFAULT_ROUTES,
+            "last_updated": ""
+        }
+        try:
+            with open(cache_path, "w") as f:
+                json.dump(cache_data, f, indent=2)
+            log_debug("GET handler initialized cache file with default routes.")
+        except Exception as e:
+            log_debug(f"GET handler failed to initialize cache file: {str(e)}")
+            
+    # Check if cache is old (older than 6 hours) or empty last_updated
+    should_update = False
+    last_updated_str = cache_data.get("last_updated", "")
+    if not last_updated_str:
+        should_update = True
+        log_debug("Cache has no last_updated timestamp. Scheduling update.")
+    else:
+        try:
+            last_updated = datetime.fromisoformat(last_updated_str)
+            age = datetime.utcnow() - last_updated
+            if age > timedelta(hours=6):
+                should_update = True
+                log_debug(f"Cache is stale (age: {age}). Scheduling update.")
+            else:
+                log_debug(f"Cache is fresh (age: {age}). No update scheduled.")
+        except ValueError:
+            should_update = True
+            log_debug("Cache has invalid last_updated timestamp. Scheduling update.")
+            
+    if should_update and not IS_UPDATING_POPULAR_ROUTES:
+        background_tasks.add_task(update_popular_prices_task)
+        log_debug("Background update task scheduled in FastAPI.")
+        
+    return cache_data

@@ -238,7 +238,7 @@ function FlightCard({ flight, index }) {
 
   return (
     <div className={`flight-card ${index === 0 ? 'best-deal' : ''} ${expanded ? 'expanded' : ''}`}>
-      {index === 0 && <div className="best-badge"><Award size={16} style={{marginRight: 4}} /> Best Deal</div>}
+      {index === 0 && <div className="best-badge"><Award size={16} style={{ marginRight: 4 }} /> Best Deal</div>}
 
       <div className="flight-main" onClick={() => setExpanded(!expanded)}>
         <div className="airline-info">
@@ -260,7 +260,7 @@ function FlightCard({ flight, index }) {
             </div>
             <div className="line-bar">
               <div className="line" />
-              <Plane size={16} className="plane-icon" style={{fill: 'currentColor'}} />
+              <Plane size={16} className="plane-icon" style={{ fill: 'currentColor' }} />
             </div>
             <div className="duration">{formatDuration(flight.duration_minutes)}</div>
           </div>
@@ -297,7 +297,7 @@ function FlightCard({ flight, index }) {
             <div className="detail-item">
               <span className="detail-label">Refundable</span>
               <span className={`detail-value ${flight.refundable ? 'green' : 'red'}`}>
-                {flight.refundable ? <><Check size={16} style={{marginRight: 4}} /> Yes</> : <><X size={16} style={{marginRight: 4}} /> No</>}
+                {flight.refundable ? <><Check size={16} style={{ marginRight: 4 }} /> Yes</> : <><X size={16} style={{ marginRight: 4 }} /> No</>}
               </span>
             </div>
             <div className="detail-item">
@@ -320,9 +320,9 @@ function FlightCard({ flight, index }) {
 
           <div className="card-actions">
             <button className="btn-book" onClick={() => window.open(flight.booking_url, '_blank')}>
-              Book on {flight.source} <ExternalLink size={16} style={{marginLeft: 6}} />
+              Book on {flight.source} <ExternalLink size={16} style={{ marginLeft: 6 }} />
             </button>
-            <button className="btn-save"><Heart size={16} style={{marginRight: 6}} /> Save</button>
+            <button className="btn-save"><Heart size={16} style={{ marginRight: 6 }} /> Save</button>
           </div>
         </div>
       )}
@@ -356,7 +356,7 @@ export default function SearchResults({ results, params, loading, error, onReset
         <p>We're connecting to real-time airline databases. This takes a few seconds.</p>
         <div className="loading-bar"><div className="loading-bar-fill" /></div>
         <div className="loading-sources">
-          {['Kayak', 'Momondo', 'Cheapflights'].map(s => (
+          {['Google Flights'].map(s => (
             <span key={s} className="source-tag">{s}</span>
           ))}
         </div>
@@ -405,101 +405,101 @@ export default function SearchResults({ results, params, loading, error, onReset
   return (
     <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
       <div className="results-page">
-      {/* Header */}
-      <div className="results-header">
-        <button className="btn-back" onClick={onReset}>← Back</button>
-        <div className="search-summary">
-          <h2>{params?.origin} → {params?.destination}</h2>
-          <span>{params?.date}{params?.returnDate ? ` → ${params?.returnDate}` : ''} · {params?.passengers} pax · {params?.cabinClass}</span>
+        {/* Header */}
+        <div className="results-header">
+          <button className="btn-back" onClick={onReset}>← Back</button>
+          <div className="search-summary">
+            <h2>{params?.origin} → {params?.destination}</h2>
+            <span>{params?.date}{params?.returnDate ? ` → ${params?.returnDate}` : ''} · {params?.passengers} pax · {params?.cabinClass}</span>
+          </div>
+          <div className="results-meta">
+            <select className="currency-selector" value={currency} onChange={e => setCurrency(e.target.value)} style={{ marginRight: '12px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: 'inherit', border: '1px solid rgba(255,255,255,0.2)' }}>
+              {Object.keys(EXCHANGE_RATES).map(c => <option key={c} value={c} style={{ color: '#333' }}>{c}</option>)}
+            </select>
+            {flights.length} results · Updated {new Date(results.scraped_at || Date.now()).toLocaleTimeString()}
+          </div>
         </div>
-        <div className="results-meta">
-          <select className="currency-selector" value={currency} onChange={e => setCurrency(e.target.value)} style={{marginRight: '12px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: 'inherit', border: '1px solid rgba(255,255,255,0.2)'}}>
-            {Object.keys(EXCHANGE_RATES).map(c => <option key={c} value={c} style={{color: '#333'}}>{c}</option>)}
-          </select>
-          {flights.length} results · Updated {new Date(results.scraped_at || Date.now()).toLocaleTimeString()}
-        </div>
-      </div>
 
-      {/* Stats bar */}
-      <div className="stats-bar">
-        <div className="stat-pill">
-          <span className="stat-pl">Cheapest</span>
-          <span className="stat-pv gold">{formatPrice(cheapest)}</span>
+        {/* Stats bar */}
+        <div className="stats-bar">
+          <div className="stat-pill">
+            <span className="stat-pl">Cheapest</span>
+            <span className="stat-pv gold">{formatPrice(cheapest)}</span>
+          </div>
+          <div className="stat-pill">
+            <span className="stat-pl">Sources</span>
+            <span className="stat-pv">{results.sources_checked || 3} sites</span>
+          </div>
+          <div className="stat-pill">
+            <span className="stat-pl">Scan time</span>
+            <span className="stat-pv">{results.scrape_duration_ms || '—'}ms</span>
+          </div>
+          <button
+            className={`pipeline-toggle-btn ${showPipeline ? 'active' : ''}`}
+            onClick={() => setShowPipeline(!showPipeline)}
+          >
+            <Settings size={16} style={{ marginRight: 8 }} /> {showPipeline ? 'Hide' : 'View'} Data Pipeline
+          </button>
         </div>
-        <div className="stat-pill">
-          <span className="stat-pl">Sources</span>
-          <span className="stat-pv">{results.sources_checked || 3} sites</span>
-        </div>
-        <div className="stat-pill">
-          <span className="stat-pl">Scan time</span>
-          <span className="stat-pv">{results.scrape_duration_ms || '—'}ms</span>
-        </div>
-        <button
-          className={`pipeline-toggle-btn ${showPipeline ? 'active' : ''}`}
-          onClick={() => setShowPipeline(!showPipeline)}
-        >
-          <Settings size={16} style={{marginRight: 8}} /> {showPipeline ? 'Hide' : 'View'} Data Pipeline
-        </button>
-      </div>
 
-      {/* Data Pipeline Panel */}
-      {showPipeline && <DataPipelinePanel results={results} />}
+        {/* Data Pipeline Panel */}
+        {showPipeline && <DataPipelinePanel results={results} />}
 
-      <div className="results-layout">
-        {/* Sidebar Filters */}
-        <aside className="filters-sidebar">
-          <h3>Filters</h3>
+        <div className="results-layout">
+          {/* Sidebar Filters */}
+          <aside className="filters-sidebar">
+            <h3>Filters</h3>
 
-          <div className="filter-group">
-            <div className="filter-label">Stops</div>
-            {stopsOptions.map(s => (
-              <label key={s} className="filter-option">
-                <input
-                  type="radio"
-                  name="stops"
-                  checked={filterStops === s}
-                  onChange={() => setFilterStops(s)}
-                />
-                {s}
-              </label>
+            <div className="filter-group">
+              <div className="filter-label">Stops</div>
+              {stopsOptions.map(s => (
+                <label key={s} className="filter-option">
+                  <input
+                    type="radio"
+                    name="stops"
+                    checked={filterStops === s}
+                    onChange={() => setFilterStops(s)}
+                  />
+                  {s}
+                </label>
+              ))}
+            </div>
+
+            <div className="filter-group">
+              <div className="filter-label">Airlines</div>
+              {airlines.map(a => (
+                <label key={a} className="filter-option">
+                  <input
+                    type="radio"
+                    name="airline"
+                    checked={filterAirline === a}
+                    onChange={() => setFilterAirline(a)}
+                  />
+                  {a}
+                </label>
+              ))}
+            </div>
+          </aside>
+
+          {/* Results List */}
+          <div className="results-list">
+            <div className="sort-bar">
+              {SORT_OPTIONS.map(s => (
+                <button
+                  key={s}
+                  className={`sort-btn ${sort === s ? 'active' : ''}`}
+                  onClick={() => setSort(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            {flights.map((flight, i) => (
+              <FlightCard key={flight.id || i} flight={flight} index={i} />
             ))}
           </div>
-
-          <div className="filter-group">
-            <div className="filter-label">Airlines</div>
-            {airlines.map(a => (
-              <label key={a} className="filter-option">
-                <input
-                  type="radio"
-                  name="airline"
-                  checked={filterAirline === a}
-                  onChange={() => setFilterAirline(a)}
-                />
-                {a}
-              </label>
-            ))}
-          </div>
-        </aside>
-
-        {/* Results List */}
-        <div className="results-list">
-          <div className="sort-bar">
-            {SORT_OPTIONS.map(s => (
-              <button
-                key={s}
-                className={`sort-btn ${sort === s ? 'active' : ''}`}
-                onClick={() => setSort(s)}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-
-          {flights.map((flight, i) => (
-            <FlightCard key={flight.id || i} flight={flight} index={i} />
-          ))}
         </div>
-      </div>
       </div>
     </CurrencyContext.Provider>
   );

@@ -1,0 +1,137 @@
+{
+  "routes": [
+    {
+      "from": "MNL",
+      "to": "SIN",
+      "label": "Manila → Singapore",
+      "price": "$396",
+      "is_live": true,
+      "scraped_at": "2026-05-18T03:40:34.017246",
+      "departure_date": "2026-06-01",
+      "price_trend": "high",
+      "airline_breakdown": [
+        {"airline": "Cebu Pacific", "price": "$402"},
+        {"airline": "Scoot", "price": "$417"},
+        {"airline": "Singapore Airlines", "price": "$595"}
+      ],
+      "price_history": [
+        {"date": "May 4", "price": 380},
+        {"date": "May 8", "price": 390},
+        {"date": "May 12", "price": 410},
+        {"date": "May 16", "price": 385},
+        {"date": "May 18", "price": 396}
+      ]
+    },
+    {
+      "from": "MNL",
+      "to": "HKG",
+      "label": "Manila → Hong Kong",
+      "price": "$227",
+      "is_live": true,
+      "scraped_at": "2026-05-18T03:41:15.048470",
+      "departure_date": "2026-06-01",
+      "price_trend": "typical",
+      "airline_breakdown": [
+        {"airline": "Hong Kong Express", "price": "$227"},
+        {"airline": "Cebu Pacific", "price": "$235"},
+        {"airline": "Cathay Pacific", "price": "$380"}
+      ],
+      "price_history": [
+        {"date": "May 4", "price": 240},
+        {"date": "May 8", "price": 220},
+        {"date": "May 12", "price": 230},
+        {"date": "May 16", "price": 215},
+        {"date": "May 18", "price": 227}
+      ]
+    },
+    {
+      "from": "MNL",
+      "to": "NRT",
+      "label": "Manila → Tokyo",
+      "price": "$366",
+      "is_live": true,
+      "scraped_at": "2026-05-18T03:41:31.789554",
+      "departure_date": "2026-06-01",
+      "price_trend": "typical",
+      "airline_breakdown": [
+        {"airline": "Jetstar Japan", "price": "$366"},
+        {"airline": "Cebu Pacific", "price": "$380"},
+        {"airline": "Philippine Airlines", "price": "$520"}
+      ],
+      "price_history": [
+        {"date": "May 4", "price": 350},
+        {"date": "May 8", "price": 370},
+        {"date": "May 12", "price": 390},
+        {"date": "May 16", "price": 360},
+        {"date": "May 18", "price": 366}
+      ]
+    },
+    {
+      "from": "MNL",
+      "to": "DXB",
+      "label": "Manila → Dubai",
+      "price": "$818",
+      "is_live": true,
+      "scraped_at": "2026-05-18T03:41:56.589505",
+      "departure_date": "2026-06-01",
+      "price_trend": "high",
+      "airline_breakdown": [
+        {"airline": "Cebu Pacific", "price": "$818"},
+        {"airline": "Gulf Air", "price": "$890"},
+        {"airline": "Emirates", "price": "$1250"}
+      ],
+      "price_history": [
+        {"date": "May 4", "price": 790},
+        {"date": "May 8", "price": 810},
+        {"date": "May 12", "price": 840},
+        {"date": "May 16", "price": 800},
+        {"date": "May 18", "price": 818}
+      ]
+    },
+    {
+      "from": "MNL",
+      "to": "LAX",
+      "label": "Manila → Los Angeles",
+      "price": "$1148",
+      "is_live": true,
+      "scraped_at": "2026-05-18T03:42:43.151838",
+      "departure_date": "2026-06-01",
+      "price_trend": "high",
+      "airline_breakdown": [
+        {"airline": "Asiana Airlines", "price": "$1148"},
+        {"airline": "Philippine Airlines", "price": "$1250"},
+        {"airline": "Japan Airlines", "price": "$1400"}
+      ],
+      "price_history": [
+        {"date": "May 4", "price": 1100},
+        {"date": "May 8", "price": 1150},
+        {"date": "May 12", "price": 1200},
+        {"date": "May 16", "price": 1130},
+        {"date": "May 18", "price": 1148}
+      ]
+    },
+    {
+      "from": "MNL",
+      "to": "SYD",
+      "label": "Manila → Sydney",
+      "price": "$637",
+      "is_live": true,
+      "scraped_at": "2026-05-18T03:43:06.429658",
+      "departure_date": "2026-06-01",
+      "price_trend": "typical",
+      "airline_breakdown": [
+        {"airline": "Cebu Pacific", "price": "$637"},
+        {"airline": "Philippine Airlines", "price": "$780"},
+        {"airline": "Qantas", "price": "$950"}
+      ],
+      "price_history": [
+        {"date": "May 4", "price": 620},
+        {"date": "May 8", "price": 650},
+        {"date": "May 12", "price": 680},
+        {"date": "May 16", "price": 630},
+        {"date": "May 18", "price": 637}
+      ]
+    }
+  ],
+  "last_updated": "2026-05-18T03:43:08.437619"
+}

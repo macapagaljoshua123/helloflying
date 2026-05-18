@@ -464,6 +464,38 @@
   color: #f59e0b;
   font-size: 0.85rem;
   font-family: 'Syne', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 4px;
+  padding: 0.08rem 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #4ade80;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.live-dot {
+  width: 5px;
+  height: 5px;
+  background: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #22c55e;
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
 }
 
 .route-arrow {
@@ -623,3 +655,454 @@
 .ac-city { font-size: 0.9rem; font-weight: 600; color: #fff; text-transform: capitalize; }
 .ac-name { font-size: 0.75rem; color: rgba(255,255,255,0.5); text-transform: capitalize; }
 .autocomplete-empty { padding: 1rem; color: rgba(255,255,255,0.5); text-align: center; font-size: 0.9rem; }
+
+/* ─── LIVE INSIGHTS & PRICE TRACKING MODAL ─── */
+.insight-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(8, 10, 18, 0.75);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  animation: fadeInModalOverlay 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInModalOverlay {
+  to { opacity: 1; }
+}
+
+.insight-modal-content {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(10, 15, 28, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  width: 92%;
+  max-width: 550px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(37, 99, 235, 0.15);
+  overflow: hidden;
+  transform: translateY(30px) scale(0.95);
+  animation: slideUpModalContent 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  position: relative;
+}
+
+@keyframes slideUpModalContent {
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.insight-modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.5rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.insight-modal-close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.insight-modal-header {
+  padding: 1.75rem 2rem 1rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.insight-modal-header h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  color: #fff;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.01em;
+}
+
+.insight-subtitle {
+  font-size: 0.85rem;
+  color: #60a5fa;
+  margin: 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.insight-modal-body {
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Tracker Card & Toggle Switch */
+.tracker-toggle-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 0.85rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tracker-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.tracker-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.tracker-desc {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Switch styling */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  transition: .3s;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: .3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+input:checked + .slider {
+  background-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Alerts and Banners */
+.tracker-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: #34d399;
+  line-height: 1.4;
+}
+
+.price-trend-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  line-height: 1.4;
+}
+
+.price-trend-banner.high {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.price-trend-banner.high .trend-icon-wrapper {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.price-trend-banner.high .trend-status strong {
+  color: #f87171;
+}
+
+.price-trend-banner.low {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.price-trend-banner.low .trend-icon-wrapper {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.price-trend-banner.low .trend-status strong {
+  color: #34d399;
+}
+
+.price-trend-banner.typical {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.price-trend-banner.typical .trend-icon-wrapper {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.price-trend-banner.typical .trend-status strong {
+  color: #fbbf24;
+}
+
+.trend-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.trend-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.trend-status {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.trend-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+/* SVG Line Graph */
+.price-history-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.price-history-section h4,
+.airlines-comparison-section h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 0.1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.price-history-chart {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem 1rem 0.5rem 1rem;
+  position: relative;
+  overflow: visible;
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chart-dot-group circle {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.chart-dot-group:hover circle {
+  r: 7px;
+  fill: #34d399;
+  filter: drop-shadow(0 0 6px #34d399);
+}
+
+.chart-tooltip-text {
+  font-size: 10px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  fill: #fff;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.chart-dot-group:hover .chart-tooltip-text {
+  opacity: 1;
+  font-size: 11px;
+}
+
+.chart-axis-text {
+  font-size: 9px;
+  fill: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+/* Airlines price comparison rows */
+.airlines-comparison-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.airlines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.airline-price-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.airline-price-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.airline-name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.airline-icon {
+  color: #60a5fa;
+  flex-shrink: 0;
+}
+
+.airline-name {
+  font-size: 0.88rem;
+  font-weight: 550;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.airline-price-action {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.airline-price-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fbbf24;
+  font-family: 'Syne', sans-serif;
+}
+
+.btn-select-airline {
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  color: #3b82f6;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.btn-select-airline:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+}
+
+/* Modal Footer & large CTA button */
+.insight-modal-footer {
+  padding: 1.25rem 2rem 1.75rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.btn-search-route-full {
+  background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
+}
+
+.btn-search-route-full:hover {
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-search-route-full:active {
+  transform: translateY(0);
+}
