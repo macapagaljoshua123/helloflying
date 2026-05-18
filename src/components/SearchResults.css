@@ -15,9 +15,9 @@
 }
 
 .btn-back {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.75);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
   padding: 0.55rem 1.1rem;
   border-radius: 8px;
   font-size: 0.88rem;
@@ -26,7 +26,7 @@
 }
 
 .btn-back:hover {
-  background: rgba(255,255,255,0.14);
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
 }
 
@@ -42,12 +42,12 @@
 
 .search-summary span {
   font-size: 0.85rem;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .results-meta {
   font-size: 0.82rem;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
   text-align: right;
 }
 
@@ -63,15 +63,15 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 999px;
   padding: 0.4rem 1rem;
 }
 
 .stat-pl {
   font-size: 0.78rem;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .stat-pv {
@@ -80,7 +80,9 @@
   font-family: 'Syne', sans-serif;
 }
 
-.stat-pv.gold { color: #f59e0b; }
+.stat-pv.gold {
+  color: #f59e0b;
+}
 
 /* ─── LAYOUT ─── */
 .results-layout {
@@ -92,8 +94,8 @@
 
 /* ─── SIDEBAR ─── */
 .filters-sidebar {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 1.25rem;
   position: sticky;
@@ -103,7 +105,7 @@
 .filters-sidebar h3 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 1.25rem;
@@ -116,7 +118,7 @@
 .filter-label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.6rem;
@@ -127,7 +129,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.88rem;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   padding: 0.25rem 0;
   cursor: pointer;
 }
@@ -145,8 +147,8 @@
 
 .sort-btn {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.55);
   padding: 0.4rem 1rem;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -154,20 +156,20 @@
 }
 
 .sort-btn:hover {
-  border-color: rgba(255,255,255,0.25);
-  color: rgba(255,255,255,0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .sort-btn.active {
-  background: rgba(37,99,235,0.3);
+  background: rgba(37, 99, 235, 0.3);
   border-color: #2563eb;
   color: #fff;
 }
 
 /* ─── FLIGHT CARD ─── */
 .flight-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 14px;
   margin-bottom: 0.75rem;
   overflow: hidden;
@@ -176,17 +178,17 @@
 }
 
 .flight-card:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .flight-card.best-deal {
-  border-color: rgba(245,158,11,0.4);
-  background: rgba(245,158,11,0.06);
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.06);
 }
 
 .best-badge {
-  background: rgba(245,158,11,0.2);
-  border-bottom: 1px solid rgba(245,158,11,0.3);
+  background: rgba(245, 158, 11, 0.2);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
   color: #fcd34d;
   font-size: 0.78rem;
   font-weight: 600;
@@ -213,8 +215,8 @@
 .airline-logo {
   width: 40px;
   height: 40px;
-  background: rgba(37,99,235,0.2);
-  border: 1px solid rgba(37,99,235,0.3);
+  background: rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(37, 99, 235, 0.3);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -232,7 +234,7 @@
 
 .flight-number {
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .flight-route {
@@ -254,7 +256,7 @@
 
 .airport {
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.45);
   margin-top: 2px;
 }
 
@@ -268,7 +270,7 @@
 
 .stops-label {
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .line-bar {
@@ -281,7 +283,7 @@
 .line {
   flex: 1;
   height: 1px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .plane-icon {
@@ -295,7 +297,7 @@
 
 .duration {
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .flight-price-col {
@@ -312,14 +314,14 @@
 
 .price-note {
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .source-badge {
   display: inline-block;
   margin-top: 0.3rem;
-  background: rgba(37,99,235,0.2);
-  border: 1px solid rgba(37,99,235,0.35);
+  background: rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(37, 99, 235, 0.35);
   border-radius: 4px;
   padding: 0.15rem 0.5rem;
   font-size: 0.68rem;
@@ -327,16 +329,16 @@
 }
 
 .expand-btn {
-  color: rgba(255,255,255,0.35);
+  color: rgba(255, 255, 255, 0.35);
   font-size: 0.7rem;
   padding-left: 0.5rem;
 }
 
 /* ─── FLIGHT DETAILS ─── */
 .flight-details {
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 1rem 1.25rem;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .details-grid {
@@ -354,21 +356,26 @@
 
 .detail-label {
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .detail-value {
   font-size: 0.88rem;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.detail-value.green { color: #4ade80; }
-.detail-value.red { color: #f87171; }
+.detail-value.green {
+  color: #4ade80;
+}
+
+.detail-value.red {
+  color: #f87171;
+}
 
 .layovers {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
@@ -377,7 +384,7 @@
 .layover-title {
   font-size: 0.75rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.45);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -387,7 +394,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.85rem;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   padding: 0.2rem 0;
 }
 
@@ -409,20 +416,22 @@
   transition: opacity 0.2s;
 }
 
-.btn-book:hover { opacity: 0.85; }
+.btn-book:hover {
+  opacity: 0.85;
+}
 
 .btn-save {
   padding: 0.7rem 1.2rem;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 10px;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
   transition: all 0.2s;
 }
 
 .btn-save:hover {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
   color: #fff;
 }
 
@@ -466,20 +475,37 @@
   position: absolute;
   top: -10px;
   left: 50%;
-  margin-left: -14px; /* half of plane size to center it */
+  margin-left: -14px;
+  /* half of plane size to center it */
   color: #fcd34d;
   filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.6));
-  transform: rotate(90deg); /* face the direction of the orbit */
+  transform: rotate(90deg);
+  /* face the direction of the orbit */
 }
 
 @keyframes orbitRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3)); opacity: 0.7; }
-  50% { filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.6)); opacity: 1; transform: scale(1.05); }
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
+    opacity: 0.7;
+  }
+
+  50% {
+    filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.6));
+    opacity: 1;
+    transform: scale(1.05);
+  }
 }
 
 .results-loading h2 {
@@ -488,7 +514,7 @@
 }
 
 .results-loading p {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.9rem;
 }
 
@@ -496,7 +522,7 @@
   width: 300px;
   max-width: 90vw;
   height: 4px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -509,9 +535,17 @@
 }
 
 @keyframes loadingFill {
-  0% { width: 0; }
-  70% { width: 85%; }
-  100% { width: 100%; }
+  0% {
+    width: 0;
+  }
+
+  70% {
+    width: 85%;
+  }
+
+  100% {
+    width: 100%;
+  }
 }
 
 .loading-sources {
@@ -522,8 +556,8 @@
 }
 
 .source-tag {
-  background: rgba(37,99,235,0.15);
-  border: 1px solid rgba(37,99,235,0.3);
+  background: rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(37, 99, 235, 0.3);
   border-radius: 6px;
   padding: 0.25rem 0.7rem;
   font-size: 0.8rem;
@@ -542,7 +576,9 @@
   padding: 2rem;
 }
 
-.error-icon { font-size: 3rem; }
+.error-icon {
+  font-size: 3rem;
+}
 
 .results-error h2 {
   font-size: 1.4rem;
@@ -550,7 +586,7 @@
 }
 
 .results-error p {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.9rem;
 }
 
@@ -558,16 +594,20 @@
   .results-layout {
     grid-template-columns: 1fr;
   }
+
   .filters-sidebar {
     position: static;
   }
+
   .flight-main {
     flex-wrap: wrap;
     gap: 0.75rem;
   }
+
   .pipeline-tabs {
     flex-wrap: wrap;
   }
+
   .schema-table-wrap {
     font-size: 0.75rem;
   }
@@ -611,8 +651,15 @@
 }
 
 @keyframes panelSlideIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .pipeline-header {
@@ -627,7 +674,9 @@
   margin-bottom: 0.6rem;
 }
 
-.pipeline-icon { font-size: 1.2rem; }
+.pipeline-icon {
+  font-size: 1.2rem;
+}
 
 .pipeline-title-row h3 {
   font-size: 1.05rem;
@@ -751,11 +800,30 @@
   font-family: 'Courier New', monospace;
 }
 
-.type-badge.type-string { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
-.type-badge.type-int { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
-.type-badge.type-float { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-.type-badge.type-boolean { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-.type-badge.type-array { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+.type-badge.type-string {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+.type-badge.type-int {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+}
+
+.type-badge.type-float {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+}
+
+.type-badge.type-boolean {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.type-badge.type-array {
+  background: rgba(168, 85, 247, 0.2);
+  color: #d8b4fe;
+}
 
 .field-desc {
   font-size: 0.78rem;
@@ -864,7 +932,9 @@
   word-break: break-word;
 }
 
-.raw-summary { margin-bottom: 1rem; }
+.raw-summary {
+  margin-bottom: 1rem;
+}
 
 .raw-flights-list {
   display: flex;
@@ -970,7 +1040,9 @@
   margin-bottom: 0.75rem;
 }
 
-.source-card-icon { font-size: 1.2rem; }
+.source-card-icon {
+  font-size: 1.2rem;
+}
 
 .source-card-header h4 {
   font-size: 0.95rem;
@@ -1002,7 +1074,9 @@
   font-family: 'Syne', sans-serif;
 }
 
-.source-stat-value.gold { color: #f59e0b; }
+.source-stat-value.gold {
+  color: #f59e0b;
+}
 
 .source-flights-mini {
   display: flex;
@@ -1020,4 +1094,77 @@
   padding: 0.15rem 0;
 }
 
-.mini-flight .gold { color: #fcd34d; font-weight: 600; }
+.mini-flight .gold {
+  color: #fcd34d;
+  font-weight: 600;
+}
+
+/* Save message styles */
+.save-message {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.save-message.success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
+}
+
+.save-message.error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.save-search-btn {
+  background: rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  color: #60a5fa;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.save-search-btn:hover {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.save-search-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.btn-save.saved {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

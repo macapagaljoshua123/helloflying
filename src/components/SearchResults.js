@@ -9,6 +9,8 @@ const CurrencyContext = createContext();
 const EXCHANGE_RATES = { USD: 1, PHP: 57.5, JPY: 155, EUR: 0.92, GBP: 0.79 };
 const CURRENCY_SYMBOLS = { USD: '$', PHP: '₱', JPY: '¥', EUR: '€', GBP: '£' };
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 function formatDuration(minutes) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -89,7 +91,6 @@ function DataPipelinePanel({ results }) {
       </div>
 
       <div className="pipeline-content">
-        {/* UNIFORM SCHEMA TAB */}
         {activeTab === 'schema' && (
           <div className="schema-tab">
             <p className="tab-desc">Every flight from every source is normalized into this <strong>20-field uniform schema</strong> before reaching the frontend:</p>
@@ -118,7 +119,6 @@ function DataPipelinePanel({ results }) {
           </div>
         )}
 
-        {/* PREPROCESSING TAB */}
         {activeTab === 'preprocessing' && (
           <div className="preprocessing-tab">
             <p className="tab-desc">Data goes through <strong>6 preprocessing stages</strong> before it reaches your screen:</p>
@@ -142,7 +142,6 @@ function DataPipelinePanel({ results }) {
           </div>
         )}
 
-        {/* RAW JSON TAB */}
         {activeTab === 'raw' && (
           <div className="raw-tab">
             <p className="tab-desc">
@@ -169,7 +168,7 @@ function DataPipelinePanel({ results }) {
                     <span className="raw-idx">#{i + 1}</span>
                     <span className="raw-airline">{f.airline}</span>
                     <span className="raw-route">{f.origin} → {f.destination}</span>
-                    <span className="raw-price">{formatPrice(f.price)}</span>
+                    <span className="raw-price">{f.price}</span>
                     <span className="raw-source">{f.source}</span>
                     <span className="raw-arrow">{expandedJson === i ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
                   </button>
@@ -182,7 +181,6 @@ function DataPipelinePanel({ results }) {
           </div>
         )}
 
-        {/* SOURCES TAB */}
         {activeTab === 'sources' && (
           <div className="sources-tab">
             <p className="tab-desc">Flights gathered from <strong>{sources.length} data sources</strong>, each contributing to the unified dataset:</p>
@@ -232,9 +230,46 @@ function DataPipelinePanel({ results }) {
 }
 
 /* ─── FLIGHT CARD ─────────────────────────────────────────────────────────── */
-function FlightCard({ flight, index }) {
+function FlightCard({ flight, index, onSaveFlight }) {
   const [expanded, setExpanded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const { formatPrice } = useContext(CurrencyContext);
+
+  const handleSaveFlight = async () => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      alert('Please sign in to save flights');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch(`${API_URL}/api/save-flight`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          flight: flight
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || 'Failed to save');
+      }
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error('Save error:', err);
+      alert(err.message || 'Failed to save flight');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className={`flight-card ${index === 0 ? 'best-deal' : ''} ${expanded ? 'expanded' : ''}`}>
@@ -322,7 +357,14 @@ function FlightCard({ flight, index }) {
             <button className="btn-book" onClick={() => window.open(flight.booking_url, '_blank')}>
               Book on {flight.source} <ExternalLink size={16} style={{ marginLeft: 6 }} />
             </button>
-            <button className="btn-save"><Heart size={16} style={{ marginRight: 6 }} /> Save</button>
+            <button
+              className={`btn-save ${saved ? 'saved' : ''}`}
+              onClick={handleSaveFlight}
+              disabled={saving}
+            >
+              <Heart size={16} style={{ marginRight: 6 }} />
+              {saving ? 'Saving...' : saved ? 'Saved!' : 'Save'}
+            </button>
           </div>
         </div>
       )}
@@ -337,10 +379,68 @@ export default function SearchResults({ results, params, loading, error, onReset
   const [filterAirline, setFilterAirline] = useState('All');
   const [showPipeline, setShowPipeline] = useState(false);
   const [currency, setCurrency] = useState('USD');
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
 
   const formatPrice = (priceInUSD) => {
     const converted = priceInUSD * EXCHANGE_RATES[currency];
     return `${CURRENCY_SYMBOLS[currency]}${Number(converted.toFixed(0)).toLocaleString()}`;
+  };
+
+  const saveCurrentSearch = async () => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      setSaveMessage('Please sign in to save this search');
+      setTimeout(() => setSaveMessage(''), 3000);
+      return;
+    }
+
+    setSaving(true);
+    setSaveMessage('');
+
+    try {
+      console.log('Saving search with params:', params);
+      console.log('Token:', token);
+
+      const response = await fetch(`${API_URL}/api/save-search-results`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          search_params: {
+            origin: params?.origin,
+            destination: params?.destination,
+            date: params?.date,
+            return_date: params?.returnDate || '',
+            passengers: params?.passengers,
+            cabin_class: params?.cabinClass
+          },
+          results: {
+            flights: results?.flights,
+            total: results?.total,
+            scraped_at: results?.scraped_at
+          }
+        })
+      });
+
+      const data = await response.json();
+      console.log('Response:', data);
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to save');
+      }
+
+      setSaveMessage('Search saved successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (err) {
+      console.error('Save error:', err);
+      setSaveMessage(err.message || 'Failed to save search');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -435,12 +535,26 @@ export default function SearchResults({ results, params, loading, error, onReset
             <span className="stat-pv">{results.scrape_duration_ms || '—'}ms</span>
           </div>
           <button
+            className="save-search-btn"
+            onClick={saveCurrentSearch}
+            disabled={saving}
+          >
+            <Heart size={16} style={{ marginRight: 6 }} /> {saving ? 'Saving...' : 'Save This Search'}
+          </button>
+          <button
             className={`pipeline-toggle-btn ${showPipeline ? 'active' : ''}`}
             onClick={() => setShowPipeline(!showPipeline)}
           >
             <Settings size={16} style={{ marginRight: 8 }} /> {showPipeline ? 'Hide' : 'View'} Data Pipeline
           </button>
         </div>
+
+        {/* Save Message */}
+        {saveMessage && (
+          <div className={`save-message ${saveMessage.includes('success') ? 'success' : 'error'}`}>
+            {saveMessage}
+          </div>
+        )}
 
         {/* Data Pipeline Panel */}
         {showPipeline && <DataPipelinePanel results={results} />}
@@ -496,7 +610,7 @@ export default function SearchResults({ results, params, loading, error, onReset
             </div>
 
             {flights.map((flight, i) => (
-              <FlightCard key={flight.id || i} flight={flight} index={i} />
+              <FlightCard key={flight.id || i} flight={flight} index={i} onSaveFlight={saveCurrentSearch} />
             ))}
           </div>
         </div>

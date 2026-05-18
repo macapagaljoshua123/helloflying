@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plane, Calendar, Search, MapPin, PlaneTakeoff, PlaneLanding, Settings, User, AlertCircle, BarChart, DollarSign, Cpu, ArrowRight, ArrowLeftRight, Repeat, LayoutGrid } from 'lucide-react';
+import AuthModal from './AuthModal';
+import UserMenu from './UserMenu';
+import SavedSearchesModal from './SavedSearchesModal';
 import './LandingPage.css';
 
 const POPULAR_ROUTES = [
@@ -38,6 +41,8 @@ const AIRPORTS = [
   { code: 'AMS', city: 'Amsterdam', country: 'Netherlands', name: 'Schiphol Airport' },
 ];
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 export default function LandingPage({ onSearch, error }) {
   const [tripType, setTripType] = useState('roundtrip');
   const [form, setForm] = useState({
@@ -58,6 +63,18 @@ export default function LandingPage({ onSearch, error }) {
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
+    }
+  });
+
+  // Auth state
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSavedSearches, setShowSavedSearches] = useState(false);
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
     }
   });
 
@@ -82,16 +99,15 @@ export default function LandingPage({ onSearch, error }) {
   const filteredAirports = (query) => {
     if (!query) return AIRPORTS;
     const q = query.toLowerCase();
-    return AIRPORTS.filter(a => 
-      a.code.toLowerCase().includes(q) || 
-      a.city.toLowerCase().includes(q) || 
-      a.country.toLowerCase().includes(q) || 
+    return AIRPORTS.filter(a =>
+      a.code.toLowerCase().includes(q) ||
+      a.city.toLowerCase().includes(q) ||
+      a.country.toLowerCase().includes(q) ||
       a.name.toLowerCase().includes(q)
     );
   };
 
   useEffect(() => {
-    // Animate stat counters
     const counters = document.querySelectorAll('.stat-number[data-target]');
     counters.forEach(counter => {
       const target = parseInt(counter.getAttribute('data-target'));
@@ -127,13 +143,33 @@ export default function LandingPage({ onSearch, error }) {
   };
 
   const handleQuickRoute = (route) => {
-    setForm(prev => ({ 
-      ...prev, 
-      origin: route.from, 
+    setForm(prev => ({
+      ...prev,
+      origin: route.from,
       destination: route.to,
       date: route.departure_date || today
     }));
     document.getElementById('date-input')?.focus();
+  };
+
+  const handleAuthSuccess = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  const handleSelectSavedSearch = (search) => {
+    setForm({
+      ...form,
+      origin: search.origin,
+      destination: search.destination,
+      date: search.departure_date,
+      returnDate: search.return_date || '',
+      passengers: search.passengers,
+      cabinClass: search.cabin_class
+    });
   };
 
   const generateSvgPath = (points) => {
@@ -141,7 +177,7 @@ export default function LandingPage({ onSearch, error }) {
     const prices = points.map(p => p.price);
     const minP = Math.min(...prices) * 0.9;
     const maxP = Math.max(...prices) * 1.1;
-    
+
     return points.map((pt, idx) => {
       const x = (idx / (points.length - 1)) * 500;
       const y = 120 - ((pt.price - minP) / (maxP - minP || 1)) * 90;
@@ -169,7 +205,11 @@ export default function LandingPage({ onSearch, error }) {
           <a href="#routes">Routes</a>
           <a href="#about">About</a>
         </div>
-        <button className="btn-signin">Sign In</button>
+        {user ? (
+          <UserMenu user={user} onLogout={handleLogout} onOpenSavedSearches={() => setShowSavedSearches(true)} />
+        ) : (
+          <button className="btn-signin" onClick={() => setShowAuthModal(true)}>Sign In</button>
+        )}
       </nav>
 
       {/* Hero */}
@@ -199,7 +239,7 @@ export default function LandingPage({ onSearch, error }) {
                 className={`tab-btn ${tripType === type ? 'active' : ''}`}
                 onClick={() => setTripType(type)}
               >
-                {type === 'roundtrip' ? <><Repeat size={16} style={{marginRight: 6}} /> Round Trip</> : type === 'oneway' ? <><ArrowRight size={16} style={{marginRight: 6}} /> One Way</> : <><LayoutGrid size={16} style={{marginRight: 6}} /> Multi-City</>}
+                {type === 'roundtrip' ? <><Repeat size={16} style={{ marginRight: 6 }} /> Round Trip</> : type === 'oneway' ? <><ArrowRight size={16} style={{ marginRight: 6 }} /> One Way</> : <><LayoutGrid size={16} style={{ marginRight: 6 }} /> Multi-City</>}
               </button>
             ))}
           </div>
@@ -225,8 +265,8 @@ export default function LandingPage({ onSearch, error }) {
                 {activeDropdown === 'origin' && (
                   <div className="autocomplete-dropdown">
                     {filteredAirports(form.origin).map(a => (
-                      <div 
-                        key={a.code} 
+                      <div
+                        key={a.code}
                         className="autocomplete-item"
                         onMouseDown={(e) => {
                           e.preventDefault();
@@ -271,8 +311,8 @@ export default function LandingPage({ onSearch, error }) {
                 {activeDropdown === 'destination' && (
                   <div className="autocomplete-dropdown">
                     {filteredAirports(form.destination).map(a => (
-                      <div 
-                        key={a.code} 
+                      <div
+                        key={a.code}
                         className="autocomplete-item"
                         onMouseDown={(e) => {
                           e.preventDefault();
@@ -330,7 +370,7 @@ export default function LandingPage({ onSearch, error }) {
               <div className="form-field form-field-sm">
                 <label>Passengers</label>
                 <select name="passengers" value={form.passengers} onChange={handleChange}>
-                  {[1,2,3,4,5,6,7,8,9].map(n => (
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
                     <option key={n} value={n}>{n} {n === 1 ? 'Adult' : 'Adults'}</option>
                   ))}
                 </select>
@@ -345,11 +385,11 @@ export default function LandingPage({ onSearch, error }) {
             </div>
 
             {(formError || error) && (
-              <div className="form-error"><AlertCircle size={16} style={{marginRight: 6}} /> {formError || error}</div>
+              <div className="form-error"><AlertCircle size={16} style={{ marginRight: 6 }} /> {formError || error}</div>
             )}
 
             <button type="submit" className="search-btn">
-              <Search size={18} style={{marginRight: 8}} /> Search Flights
+              <Search size={18} style={{ marginRight: 8 }} /> Search Flights
             </button>
           </form>
         </div>
@@ -422,7 +462,7 @@ export default function LandingPage({ onSearch, error }) {
 
       {/* Footer */}
       <footer className="footer">
-        <div className="footer-logo"><Plane size={18} style={{marginRight: 6}} /> HelloFlying</div>
+        <div className="footer-logo"><Plane size={18} style={{ marginRight: 6 }} /> HelloFlying</div>
         <p>© 2025 HelloFlying Corp. All rights reserved.</p>
         <div className="footer-links">
           <a href="#privacy">Privacy</a>
@@ -438,27 +478,26 @@ export default function LandingPage({ onSearch, error }) {
             <button className="insight-modal-close" onClick={() => setActiveInsightRoute(null)}>
               &times;
             </button>
-            
+
             <div className="insight-modal-header">
               <h3>{activeInsightRoute.label}</h3>
               <p className="insight-subtitle">Live Flight Insights & Price Tracking</p>
             </div>
-            
+
             <div className="insight-modal-body">
-              {/* Tracker Toggle Section */}
               <div className="tracker-toggle-card">
                 <div className="tracker-info">
                   <div className="tracker-title">Track prices</div>
                   <div className="tracker-desc">
-                    {activeInsightRoute.departure_date 
+                    {activeInsightRoute.departure_date
                       ? `For departure on ${new Date(activeInsightRoute.departure_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
                       : 'For upcoming flight dates'}
                   </div>
                 </div>
                 <label className="switch">
-                  <input 
-                    type="checkbox" 
-                    checked={!!trackedRoutes[`${activeInsightRoute.from}-${activeInsightRoute.to}`]} 
+                  <input
+                    type="checkbox"
+                    checked={!!trackedRoutes[`${activeInsightRoute.from}-${activeInsightRoute.to}`]}
                     onChange={(e) => {
                       const key = `${activeInsightRoute.from}-${activeInsightRoute.to}`;
                       const updated = { ...trackedRoutes, [key]: e.target.checked };
@@ -477,7 +516,6 @@ export default function LandingPage({ onSearch, error }) {
                 </div>
               )}
 
-              {/* Price Trend Banner */}
               <div className={`price-trend-banner ${activeInsightRoute.price_trend || 'typical'}`}>
                 <div className="trend-icon-wrapper">
                   <DollarSign size={20} />
@@ -487,21 +525,19 @@ export default function LandingPage({ onSearch, error }) {
                     Prices are currently <strong>{(activeInsightRoute.price_trend || 'typical').toUpperCase()}</strong>
                   </div>
                   <p className="trend-desc">
-                    {activeInsightRoute.price_trend === 'high' 
+                    {activeInsightRoute.price_trend === 'high'
                       ? `Fares are currently higher than usual for this route. We suggest tracking or waiting to book.`
                       : activeInsightRoute.price_trend === 'low'
-                      ? `Fares are currently lower than usual! This is an excellent time to lock in your flight.`
-                      : `Fares are typical for these dates. Prices are stable and ready for booking.`}
+                        ? `Fares are currently lower than usual! This is an excellent time to lock in your flight.`
+                        : `Fares are typical for these dates. Prices are stable and ready for booking.`}
                   </p>
                 </div>
               </div>
 
-              {/* Price History SVG Graph */}
               {activeInsightRoute.price_history && activeInsightRoute.price_history.length > 0 && (
                 <div className="price-history-section">
                   <h4>30-Day Price Trend</h4>
                   <div className="price-history-chart">
-                    {/* SVG Line Chart */}
                     <svg viewBox="0 0 500 150" className="chart-svg">
                       <defs>
                         <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
@@ -509,28 +545,24 @@ export default function LandingPage({ onSearch, error }) {
                           <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
                         </linearGradient>
                       </defs>
-                      
-                      {/* Grid Lines */}
+
                       <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(255,255,255,0.05)" />
                       <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(255,255,255,0.05)" />
                       <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.05)" />
 
-                      {/* Line Path */}
-                      <path 
-                        d={generateSvgPath(activeInsightRoute.price_history)} 
-                        fill="none" 
-                        stroke="#10b981" 
+                      <path
+                        d={generateSvgPath(activeInsightRoute.price_history)}
+                        fill="none"
+                        stroke="#10b981"
                         strokeWidth="3"
                         strokeLinecap="round"
                       />
 
-                      {/* Gradient Fill Path */}
-                      <path 
-                        d={`${generateSvgPath(activeInsightRoute.price_history)} L 500 150 L 0 150 Z`} 
-                        fill="url(#chartGrad)" 
+                      <path
+                        d={`${generateSvgPath(activeInsightRoute.price_history)} L 500 150 L 0 150 Z`}
+                        fill="url(#chartGrad)"
                       />
 
-                      {/* Chart dots */}
                       {activeInsightRoute.price_history.map((pt, idx) => {
                         const x = (idx / (activeInsightRoute.price_history.length - 1)) * 500;
                         const prices = activeInsightRoute.price_history.map(p => p.price);
@@ -554,7 +586,6 @@ export default function LandingPage({ onSearch, error }) {
                 </div>
               )}
 
-              {/* Airline Price Comparison */}
               <div className="airlines-comparison-section">
                 <h4>Cheapest Airline Fares</h4>
                 <div className="airlines-list">
@@ -567,7 +598,7 @@ export default function LandingPage({ onSearch, error }) {
                         </div>
                         <div className="airline-price-action">
                           <span className="airline-price-val">{item.price}</span>
-                          <button 
+                          <button
                             className="btn-select-airline"
                             onClick={() => {
                               handleQuickRoute(activeInsightRoute);
@@ -587,7 +618,7 @@ export default function LandingPage({ onSearch, error }) {
                       </div>
                       <div className="airline-price-action">
                         <span className="airline-price-val">{activeInsightRoute.price}</span>
-                        <button 
+                        <button
                           className="btn-select-airline"
                           onClick={() => {
                             handleQuickRoute(activeInsightRoute);
@@ -602,10 +633,10 @@ export default function LandingPage({ onSearch, error }) {
                 </div>
               </div>
             </div>
-            
+
             <div className="insight-modal-footer">
-              <button 
-                className="btn-search-route-full" 
+              <button
+                className="btn-search-route-full"
                 onClick={() => {
                   handleQuickRoute(activeInsightRoute);
                   setActiveInsightRoute(null);
@@ -617,6 +648,20 @@ export default function LandingPage({ onSearch, error }) {
           </div>
         </div>
       )}
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
+
+      {/* Saved Searches Modal */}
+      <SavedSearchesModal
+        isOpen={showSavedSearches}
+        onClose={() => setShowSavedSearches(false)}
+        onSelectSearch={handleSelectSavedSearch}
+      />
     </div>
   );
 }

@@ -3,17 +3,23 @@ HelloFlying FastAPI Backend
 Run: uvicorn main:app --reload --port 8000
 """
 
-from fastapi import FastAPI, Query, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Query, HTTPException, BackgroundTasks, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
+from sqlalchemy.orm import Session
 import subprocess
 import json
 import asyncio
 import sys
 import os
-
 from datetime import datetime, date, timedelta
+
+# Auth imports
+from auth_routes import router as auth_router, get_current_user
+from database import engine, Base, get_db
+from models import User, SavedSearch, UserActivity
+from schemas import UserActivityCreate
 
 app = FastAPI(
     title="HelloFlying API",
@@ -29,6 +35,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
+# Include auth router
+app.include_router(auth_router)
 
 # ─── MODELS ───────────────────────────────────────────────────────────────────
 class Layover(BaseModel):
@@ -84,6 +96,92 @@ def validate_date(d: str, field: str) -> str:
     if parsed < date.today():
         raise HTTPException(status_code=400, detail=f"{field} date cannot be in the past.")
     return d
+
+    
+
+# Add this after the other routes
+@app.post("/api/save-flight")
+async def save_single_flight(
+    flight: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Save a single flight to user's saved searches"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    # Create a saved search entry for this flight
+    saved_search = SavedSearch(
+        user_id=current_user.id,
+        name=f"{flight.get('airline', 'Flight')} - {flight.get('origin', '')} to {flight.get('destination', '')}",
+        origin=flight.get("origin", ""),
+        destination=flight.get("destination", ""),
+        departure_date="",  # Will be updated from search params if needed
+        return_date="",
+        passengers=1,
+        cabin_class=flight.get("cabin_class", "Economy"),
+        saved_price=flight.get("price", 0),
+        saved_flight_data=flight
+    )
+    
+    db.add(saved_search)
+    db.commit()
+    db.refresh(saved_search)
+    
+    return {"message": "Flight saved successfully", "search_id": saved_search.id}
+
+# ─── ACTIVITIES ROUTE ──────────────────────────────────────────────────────────
+@app.post("/api/activities/log")
+async def log_activity(
+    activity: UserActivityCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Log user activity (search, save, etc.)"""
+    if not current_user:
+        return {"message": "Activity not logged (anonymous user)"}
+    
+    user_activity = UserActivity(
+        user_id=current_user.id,
+        activity_type=activity.activity_type,
+        search_params=activity.search_params,
+        best_price_found=activity.best_price_found
+    )
+    
+    db.add(user_activity)
+    db.commit()
+    
+    return {"message": "Activity logged successfully"}
+
+
+@app.post("/api/save-search-results")
+async def save_search_results(
+    search_params: dict,
+    results: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Save complete search results for a user"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    # Create a saved search entry
+    saved_search = SavedSearch(
+        user_id=current_user.id,
+        origin=search_params.get("origin", ""),
+        destination=search_params.get("destination", ""),
+        departure_date=search_params.get("date", ""),
+        return_date=search_params.get("return_date", ""),
+        passengers=search_params.get("passengers", 1),
+        cabin_class=search_params.get("cabin_class", "Economy"),
+        saved_price=results.get("flights", [{}])[0].get("price") if results.get("flights") else None,
+        saved_flight_data=results
+    )
+    
+    db.add(saved_search)
+    db.commit()
+    
+    return {"message": "Search results saved", "search_id": saved_search.id}
 
 # ─── CALL PUPPETEER SCRAPER ────────────────────────────────────────────────────
 def _run_scraper_sync(params: dict) -> dict:
