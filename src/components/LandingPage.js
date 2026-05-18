@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Plane, Calendar, Search, MapPin, PlaneTakeoff, PlaneLanding, Settings, User, AlertCircle, BarChart, DollarSign, Cpu, ArrowRight, ArrowLeftRight, Repeat, LayoutGrid } from 'lucide-react';
 import './LandingPage.css';
 
 const POPULAR_ROUTES = [
@@ -12,6 +13,31 @@ const POPULAR_ROUTES = [
 
 const CABIN_CLASSES = ['Economy', 'Premium Economy', 'Business', 'First Class'];
 
+const AIRPORTS = [
+  { code: 'MNL', city: 'Manila', country: 'Philippines', name: 'Ninoy Aquino Intl' },
+  { code: 'SIN', city: 'Singapore', country: 'Singapore', name: 'Changi Airport' },
+  { code: 'HKG', city: 'Hong Kong', country: 'Hong Kong', name: 'Hong Kong Intl' },
+  { code: 'NRT', city: 'Tokyo', country: 'Japan', name: 'Narita Intl' },
+  { code: 'HND', city: 'Tokyo', country: 'Japan', name: 'Haneda Airport' },
+  { code: 'DXB', city: 'Dubai', country: 'UAE', name: 'Dubai Intl' },
+  { code: 'LAX', city: 'Los Angeles', country: 'USA', name: 'Los Angeles Intl' },
+  { code: 'SYD', city: 'Sydney', country: 'Australia', name: 'Sydney Airport' },
+  { code: 'BKK', city: 'Bangkok', country: 'Thailand', name: 'Suvarnabhumi Airport' },
+  { code: 'ICN', city: 'Seoul', country: 'South Korea', name: 'Incheon Intl' },
+  { code: 'JFK', city: 'New York', country: 'USA', name: 'John F. Kennedy Intl' },
+  { code: 'LHR', city: 'London', country: 'UK', name: 'Heathrow Airport' },
+  { code: 'CDG', city: 'Paris', country: 'France', name: 'Charles de Gaulle Airport' },
+  { code: 'FRA', city: 'Frankfurt', country: 'Germany', name: 'Frankfurt Airport' },
+  { code: 'KUL', city: 'Kuala Lumpur', country: 'Malaysia', name: 'Kuala Lumpur Intl' },
+  { code: 'TPE', city: 'Taipei', country: 'Taiwan', name: 'Taoyuan Intl' },
+  { code: 'SGN', city: 'Ho Chi Minh City', country: 'Vietnam', name: 'Tan Son Nhat Intl' },
+  { code: 'CGK', city: 'Jakarta', country: 'Indonesia', name: 'Soekarno-Hatta Intl' },
+  { code: 'BOS', city: 'Boston', country: 'USA', name: 'Logan Intl' },
+  { code: 'SFO', city: 'San Francisco', country: 'USA', name: 'San Francisco Intl' },
+  { code: 'DOH', city: 'Doha', country: 'Qatar', name: 'Hamad Intl' },
+  { code: 'AMS', city: 'Amsterdam', country: 'Netherlands', name: 'Schiphol Airport' },
+];
+
 export default function LandingPage({ onSearch, error }) {
   const [tripType, setTripType] = useState('roundtrip');
   const [form, setForm] = useState({
@@ -23,8 +49,20 @@ export default function LandingPage({ onSearch, error }) {
     cabinClass: 'Economy',
   });
   const [formError, setFormError] = useState('');
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   const today = new Date().toISOString().split('T')[0];
+
+  const filteredAirports = (query) => {
+    if (!query) return AIRPORTS;
+    const q = query.toLowerCase();
+    return AIRPORTS.filter(a => 
+      a.code.toLowerCase().includes(q) || 
+      a.city.toLowerCase().includes(q) || 
+      a.country.toLowerCase().includes(q) || 
+      a.name.toLowerCase().includes(q)
+    );
+  };
 
   useEffect(() => {
     // Animate stat counters
@@ -79,7 +117,7 @@ export default function LandingPage({ onSearch, error }) {
       {/* Navbar */}
       <nav className="navbar">
         <div className="logo">
-          <span className="logo-icon">✈</span>
+          <Plane className="logo-icon" />
           <span className="logo-text">Hello<strong>Flying</strong></span>
         </div>
         <div className="nav-links">
@@ -117,47 +155,99 @@ export default function LandingPage({ onSearch, error }) {
                 className={`tab-btn ${tripType === type ? 'active' : ''}`}
                 onClick={() => setTripType(type)}
               >
-                {type === 'roundtrip' ? '⇆ Round Trip' : type === 'oneway' ? '→ One Way' : '⊞ Multi-City'}
+                {type === 'roundtrip' ? <><Repeat size={16} style={{marginRight: 6}} /> Round Trip</> : type === 'oneway' ? <><ArrowRight size={16} style={{marginRight: 6}} /> One Way</> : <><LayoutGrid size={16} style={{marginRight: 6}} /> Multi-City</>}
               </button>
             ))}
           </div>
 
           <form className="search-form" onSubmit={handleSubmit}>
             <div className="form-row main-inputs">
-              <div className="form-field">
+              <div className="form-field" style={{ position: 'relative' }}>
                 <label>From</label>
                 <div className="input-icon-wrap">
-                  <span className="input-icon">🛫</span>
+                  <PlaneTakeoff className="input-icon" size={18} />
                   <input
                     type="text"
                     name="origin"
                     value={form.origin}
-                    onChange={handleChange}
-                    placeholder="Origin (e.g. MNL)"
-                    maxLength={4}
+                    onChange={(e) => { handleChange(e); setActiveDropdown('origin'); }}
+                    onFocus={() => setActiveDropdown('origin')}
+                    onBlur={() => setTimeout(() => setActiveDropdown(null), 200)}
+                    placeholder="Origin (e.g. MNL, Tokyo)"
+                    maxLength={30}
                     style={{ textTransform: 'uppercase' }}
                   />
                 </div>
+                {activeDropdown === 'origin' && (
+                  <div className="autocomplete-dropdown">
+                    {filteredAirports(form.origin).map(a => (
+                      <div 
+                        key={a.code} 
+                        className="autocomplete-item"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setForm(prev => ({ ...prev, origin: a.code }));
+                          setActiveDropdown(null);
+                        }}
+                      >
+                        <div className="ac-code">{a.code}</div>
+                        <div className="ac-details">
+                          <span className="ac-city">{a.city}, {a.country}</span>
+                          <span className="ac-name">{a.name}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {filteredAirports(form.origin).length === 0 && (
+                      <div className="autocomplete-empty">No airports found</div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <button type="button" className="swap-btn" onClick={() =>
                 setForm(prev => ({ ...prev, origin: prev.destination, destination: prev.origin }))
-              }>⇆</button>
+              }><ArrowLeftRight size={20} /></button>
 
-              <div className="form-field">
+              <div className="form-field" style={{ position: 'relative' }}>
                 <label>To</label>
                 <div className="input-icon-wrap">
-                  <span className="input-icon">🛬</span>
+                  <PlaneLanding className="input-icon" size={18} />
                   <input
                     type="text"
                     name="destination"
                     value={form.destination}
-                    onChange={handleChange}
-                    placeholder="Destination (e.g. SIN)"
-                    maxLength={4}
+                    onChange={(e) => { handleChange(e); setActiveDropdown('destination'); }}
+                    onFocus={() => setActiveDropdown('destination')}
+                    onBlur={() => setTimeout(() => setActiveDropdown(null), 200)}
+                    placeholder="Destination (e.g. SIN, Dubai)"
+                    maxLength={30}
                     style={{ textTransform: 'uppercase' }}
                   />
                 </div>
+                {activeDropdown === 'destination' && (
+                  <div className="autocomplete-dropdown">
+                    {filteredAirports(form.destination).map(a => (
+                      <div 
+                        key={a.code} 
+                        className="autocomplete-item"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setForm(prev => ({ ...prev, destination: a.code }));
+                          setActiveDropdown(null);
+                        }}
+                      >
+                        <div className="ac-code">{a.code}</div>
+                        <div className="ac-details">
+                          <span className="ac-city">{a.city}, {a.country}</span>
+                          <span className="ac-name">{a.name}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {filteredAirports(form.destination).length === 0 && (
+                      <div className="autocomplete-empty">No airports found</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -165,7 +255,7 @@ export default function LandingPage({ onSearch, error }) {
               <div className="form-field">
                 <label>Departure</label>
                 <div className="input-icon-wrap">
-                  <span className="input-icon">📅</span>
+                  <Calendar className="input-icon" size={18} />
                   <input
                     id="date-input"
                     type="date"
@@ -181,7 +271,7 @@ export default function LandingPage({ onSearch, error }) {
                 <div className="form-field">
                   <label>Return</label>
                   <div className="input-icon-wrap">
-                    <span className="input-icon">📅</span>
+                    <Calendar className="input-icon" size={18} />
                     <input
                       type="date"
                       name="returnDate"
@@ -211,11 +301,11 @@ export default function LandingPage({ onSearch, error }) {
             </div>
 
             {(formError || error) && (
-              <div className="form-error">⚠ {formError || error}</div>
+              <div className="form-error"><AlertCircle size={16} style={{marginRight: 6}} /> {formError || error}</div>
             )}
 
             <button type="submit" className="search-btn">
-              <span>🔍</span> Search Flights
+              <Search size={18} style={{marginRight: 8}} /> Search Flights
             </button>
           </form>
         </div>
@@ -253,7 +343,7 @@ export default function LandingPage({ onSearch, error }) {
             <button key={i} className="route-card" onClick={() => handleQuickRoute(route)}>
               <div className="route-label">{route.label}</div>
               <div className="route-price">from {route.price}</div>
-              <div className="route-arrow">→</div>
+              <div className="route-arrow"><ArrowRight size={20} /></div>
             </button>
           ))}
         </div>
@@ -264,10 +354,10 @@ export default function LandingPage({ onSearch, error }) {
         <h2>How Hello Flying Works</h2>
         <div className="steps-grid">
           {[
-            { icon: '🔍', step: '01', title: 'Enter Your Route', desc: 'Type your origin, destination, and travel dates.' },
-            { icon: '🤖', step: '02', title: 'AI Scrapes Live Prices', desc: 'Our bots check Booking.com, Skyscanner & more in real-time.' },
-            { icon: '📊', step: '03', title: 'We Normalize All Data', desc: 'Prices are unified into one comparable format instantly.' },
-            { icon: '💸', step: '04', title: 'You Pick & Save', desc: 'Choose the best deal and get redirected to book directly.' },
+            { icon: <Search size={24} />, step: '01', title: 'Enter Your Route', desc: 'Type your origin, destination, and travel dates.' },
+            { icon: <Cpu size={24} />, step: '02', title: 'AI Scrapes Live Prices', desc: 'Our bots check Booking.com, Skyscanner & more in real-time.' },
+            { icon: <BarChart size={24} />, step: '03', title: 'We Normalize All Data', desc: 'Prices are unified into one comparable format instantly.' },
+            { icon: <DollarSign size={24} />, step: '04', title: 'You Pick & Save', desc: 'Choose the best deal and get redirected to book directly.' },
           ].map((s, i) => (
             <div key={i} className="step-card">
               <div className="step-icon">{s.icon}</div>
@@ -281,7 +371,7 @@ export default function LandingPage({ onSearch, error }) {
 
       {/* Footer */}
       <footer className="footer">
-        <div className="footer-logo">✈ HelloFlying</div>
+        <div className="footer-logo"><Plane size={18} style={{marginRight: 6}} /> HelloFlying</div>
         <p>© 2025 HelloFlying Corp. All rights reserved.</p>
         <div className="footer-links">
           <a href="#privacy">Privacy</a>

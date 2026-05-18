@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, createContext } from 'react';
+import { Settings, Bug, Sparkles, RefreshCw, XCircle, BarChart2, CheckCircle, ClipboardList, Wrench, Code, Globe, Plane, AlertCircle, Search, Award, Heart, ChevronUp, ChevronDown, Check, X, ExternalLink } from 'lucide-react';
 import './SearchResults.css';
 
 const SORT_OPTIONS = ['Best', 'Cheapest', 'Fastest', 'Earliest'];
+
+const CurrencyContext = createContext();
+
+const EXCHANGE_RATES = { USD: 1, PHP: 57.5, JPY: 155, EUR: 0.92, GBP: 0.79 };
+const CURRENCY_SYMBOLS = { USD: '$', PHP: '₱', JPY: '¥', EUR: '€', GBP: '£' };
 
 function formatDuration(minutes) {
   const h = Math.floor(minutes / 60);
@@ -13,6 +19,7 @@ function formatDuration(minutes) {
 function DataPipelinePanel({ results }) {
   const [activeTab, setActiveTab] = useState('schema');
   const [expandedJson, setExpandedJson] = useState(null);
+  const { formatPrice } = useContext(CurrencyContext);
 
   if (!results || !results.flights) return null;
 
@@ -40,12 +47,12 @@ function DataPipelinePanel({ results }) {
   ];
 
   const PREPROCESSING_STEPS = [
-    { icon: '🕷️', step: 'Crawl', title: 'Multi-Source Scraping', desc: `Puppeteer stealth browser navigated ${results.sources_checked || 0} booking platforms (Booking.com, Skyscanner, Expedia, etc.) with anti-detection: random User-Agents, human-like delays, cookie banner handling.` },
-    { icon: '🧹', step: 'Clean', title: 'Data Cleaning', desc: 'Raw HTML elements parsed → price symbols stripped (₱, $, commas) → coerced to float. Duration strings ("3h 25m") parsed to integer minutes. Stop counts normalized to 0/1/2+.' },
-    { icon: '🔄', step: 'Normalize', title: 'Schema Normalization', desc: `All ${results.total || 0} flight entries mapped to a uniform 20-field JSON schema. Every field has a defined type. Airport codes uppercased. Layovers standardized to [{airport, duration}].` },
-    { icon: '🚫', step: 'Dedup', title: 'Deduplication', desc: 'Duplicate flights removed by composite key: airline + departure_time + price. Ensures no repeated entries across sources.' },
-    { icon: '📊', step: 'Sort', title: 'Price-Sort & Index', desc: 'Results sorted by price ascending. Each flight assigned a unique ID: source-flightCode-timestamp-hash for frontend tracking.' },
-    { icon: '✅', step: 'Validate', title: 'Backend Validation', desc: 'FastAPI Pydantic models enforce type constraints: price must be float, stops must be int, layovers must be array. Invalid entries rejected.' },
+    { icon: <Bug size={20} />, step: 'Crawl', title: 'Multi-Source Scraping', desc: `Puppeteer stealth browser navigated ${results.sources_checked || 0} booking platforms (Booking.com, Skyscanner, Expedia, etc.) with anti-detection: random User-Agents, human-like delays, cookie banner handling.` },
+    { icon: <Sparkles size={20} />, step: 'Clean', title: 'Data Cleaning', desc: 'Raw HTML elements parsed → price symbols stripped (₱, $, commas) → coerced to float. Duration strings ("3h 25m") parsed to integer minutes. Stop counts normalized to 0/1/2+.' },
+    { icon: <RefreshCw size={20} />, step: 'Normalize', title: 'Schema Normalization', desc: `All ${results.total || 0} flight entries mapped to a uniform 20-field JSON schema. Every field has a defined type. Airport codes uppercased. Layovers standardized to [{airport, duration}].` },
+    { icon: <XCircle size={20} />, step: 'Dedup', title: 'Deduplication', desc: 'Duplicate flights removed by composite key: airline + departure_time + price. Ensures no repeated entries across sources.' },
+    { icon: <BarChart2 size={20} />, step: 'Sort', title: 'Price-Sort & Index', desc: 'Results sorted by price ascending. Each flight assigned a unique ID: source-flightCode-timestamp-hash for frontend tracking.' },
+    { icon: <CheckCircle size={20} />, step: 'Validate', title: 'Backend Validation', desc: 'FastAPI Pydantic models enforce type constraints: price must be float, stops must be int, layovers must be array. Invalid entries rejected.' },
   ];
 
   const sources = [...new Set(results.flights.map(f => f.source))];
@@ -54,7 +61,7 @@ function DataPipelinePanel({ results }) {
     <div className="pipeline-panel">
       <div className="pipeline-header">
         <div className="pipeline-title-row">
-          <span className="pipeline-icon">⚙️</span>
+          <Settings className="pipeline-icon" size={24} />
           <h3>Data Pipeline & Preprocessing</h3>
         </div>
         <div className="pipeline-meta">
@@ -66,10 +73,10 @@ function DataPipelinePanel({ results }) {
 
       <div className="pipeline-tabs">
         {[
-          { key: 'schema', label: '📋 Uniform Schema' },
-          { key: 'preprocessing', label: '🔧 Preprocessing' },
-          { key: 'raw', label: '{ } Raw JSON' },
-          { key: 'sources', label: '🌐 Sources' },
+          { key: 'schema', label: <><ClipboardList size={16} /> Uniform Schema</> },
+          { key: 'preprocessing', label: <><Wrench size={16} /> Preprocessing</> },
+          { key: 'raw', label: <><Code size={16} /> Raw JSON</> },
+          { key: 'sources', label: <><Globe size={16} /> Sources</> },
         ].map(t => (
           <button
             key={t.key}
@@ -162,9 +169,9 @@ function DataPipelinePanel({ results }) {
                     <span className="raw-idx">#{i + 1}</span>
                     <span className="raw-airline">{f.airline}</span>
                     <span className="raw-route">{f.origin} → {f.destination}</span>
-                    <span className="raw-price">${Number(f.price).toLocaleString()}</span>
+                    <span className="raw-price">{formatPrice(f.price)}</span>
                     <span className="raw-source">{f.source}</span>
-                    <span className="raw-arrow">{expandedJson === i ? '▲' : '▼'}</span>
+                    <span className="raw-arrow">{expandedJson === i ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
                   </button>
                   {expandedJson === i && (
                     <pre className="json-block json-full">{JSON.stringify(f, null, 2)}</pre>
@@ -187,7 +194,7 @@ function DataPipelinePanel({ results }) {
                 return (
                   <div key={src} className="source-card">
                     <div className="source-card-header">
-                      <span className="source-card-icon">🌐</span>
+                      <Globe className="source-card-icon" size={20} />
                       <h4>{src}</h4>
                     </div>
                     <div className="source-stats">
@@ -197,11 +204,11 @@ function DataPipelinePanel({ results }) {
                       </div>
                       <div className="source-stat">
                         <span className="source-stat-label">Cheapest</span>
-                        <span className="source-stat-value gold">${Number(cheapest).toLocaleString()}</span>
+                        <span className="source-stat-value gold">{formatPrice(cheapest)}</span>
                       </div>
                       <div className="source-stat">
                         <span className="source-stat-label">Avg Price</span>
-                        <span className="source-stat-value">${Number(avgPrice.toFixed(0)).toLocaleString()}</span>
+                        <span className="source-stat-value">{formatPrice(avgPrice)}</span>
                       </div>
                     </div>
                     <div className="source-flights-mini">
@@ -209,7 +216,7 @@ function DataPipelinePanel({ results }) {
                         <div key={j} className="mini-flight">
                           <span>{f.airline_code} {f.flight_number}</span>
                           <span>{f.departure_time} → {f.arrival_time}</span>
-                          <span className="gold">${Number(f.price).toLocaleString()}</span>
+                          <span className="gold">{formatPrice(f.price)}</span>
                         </div>
                       ))}
                     </div>
@@ -227,14 +234,15 @@ function DataPipelinePanel({ results }) {
 /* ─── FLIGHT CARD ─────────────────────────────────────────────────────────── */
 function FlightCard({ flight, index }) {
   const [expanded, setExpanded] = useState(false);
+  const { formatPrice } = useContext(CurrencyContext);
 
   return (
     <div className={`flight-card ${index === 0 ? 'best-deal' : ''} ${expanded ? 'expanded' : ''}`}>
-      {index === 0 && <div className="best-badge">🏆 Best Deal</div>}
+      {index === 0 && <div className="best-badge"><Award size={16} style={{marginRight: 4}} /> Best Deal</div>}
 
       <div className="flight-main" onClick={() => setExpanded(!expanded)}>
         <div className="airline-info">
-          <div className="airline-logo">{flight.airline_code || '✈'}</div>
+          <div className="airline-logo"><Plane size={24} /></div>
           <div className="airline-name-wrap">
             <div className="airline-name">{flight.airline}</div>
             <div className="flight-number">{flight.flight_number}</div>
@@ -252,7 +260,7 @@ function FlightCard({ flight, index }) {
             </div>
             <div className="line-bar">
               <div className="line" />
-              <span className="plane-icon">✈</span>
+              <Plane size={16} className="plane-icon" style={{fill: 'currentColor'}} />
             </div>
             <div className="duration">{formatDuration(flight.duration_minutes)}</div>
           </div>
@@ -263,12 +271,12 @@ function FlightCard({ flight, index }) {
         </div>
 
         <div className="flight-price-col">
-          <div className="price">${Number(flight.price).toLocaleString()}</div>
+          <div className="price">{formatPrice(flight.price)}</div>
           <div className="price-note">per person</div>
           <div className="source-badge">{flight.source}</div>
         </div>
 
-        <div className="expand-btn">{expanded ? '▲' : '▼'}</div>
+        <div className="expand-btn">{expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</div>
       </div>
 
       {expanded && (
@@ -289,7 +297,7 @@ function FlightCard({ flight, index }) {
             <div className="detail-item">
               <span className="detail-label">Refundable</span>
               <span className={`detail-value ${flight.refundable ? 'green' : 'red'}`}>
-                {flight.refundable ? '✓ Yes' : '✗ No'}
+                {flight.refundable ? <><Check size={16} style={{marginRight: 4}} /> Yes</> : <><X size={16} style={{marginRight: 4}} /> No</>}
               </span>
             </div>
             <div className="detail-item">
@@ -312,9 +320,9 @@ function FlightCard({ flight, index }) {
 
           <div className="card-actions">
             <button className="btn-book" onClick={() => window.open(flight.booking_url, '_blank')}>
-              Book on {flight.source} ↗
+              Book on {flight.source} <ExternalLink size={16} style={{marginLeft: 6}} />
             </button>
-            <button className="btn-save">♡ Save</button>
+            <button className="btn-save"><Heart size={16} style={{marginRight: 6}} /> Save</button>
           </div>
         </div>
       )}
@@ -328,16 +336,27 @@ export default function SearchResults({ results, params, loading, error, onReset
   const [filterStops, setFilterStops] = useState('All');
   const [filterAirline, setFilterAirline] = useState('All');
   const [showPipeline, setShowPipeline] = useState(false);
+  const [currency, setCurrency] = useState('USD');
+
+  const formatPrice = (priceInUSD) => {
+    const converted = priceInUSD * EXCHANGE_RATES[currency];
+    return `${CURRENCY_SYMBOLS[currency]}${Number(converted.toFixed(0)).toLocaleString()}`;
+  };
 
   if (loading) {
     return (
       <div className="results-loading">
-        <div className="loading-plane">✈</div>
-        <h2>Searching across 50+ airlines...</h2>
-        <p>We're scraping live prices for you. This takes a few seconds.</p>
+        <div className="orbit-animation-container">
+          <Globe size={64} className="orbit-globe" />
+          <div className="orbit-path">
+            <Plane size={28} className="orbit-plane" />
+          </div>
+        </div>
+        <h2>Searching exact live prices...</h2>
+        <p>We're connecting to real-time airline databases. This takes a few seconds.</p>
         <div className="loading-bar"><div className="loading-bar-fill" /></div>
         <div className="loading-sources">
-          {['Booking.com', 'Skyscanner', 'Expedia', 'Kayak', 'Google Flights'].map(s => (
+          {['Kayak', 'Momondo', 'Cheapflights'].map(s => (
             <span key={s} className="source-tag">{s}</span>
           ))}
         </div>
@@ -348,7 +367,7 @@ export default function SearchResults({ results, params, loading, error, onReset
   if (error) {
     return (
       <div className="results-error">
-        <div className="error-icon">✈</div>
+        <AlertCircle size={48} className="error-icon" />
         <h2>Search failed</h2>
         <p>{error}</p>
         <button className="btn-back" onClick={onReset}>← Try Again</button>
@@ -359,7 +378,7 @@ export default function SearchResults({ results, params, loading, error, onReset
   if (!results || !results.flights || results.flights.length === 0) {
     return (
       <div className="results-error">
-        <div className="error-icon">🔍</div>
+        <Search size={48} className="error-icon" />
         <h2>No flights found</h2>
         <p>Try adjusting your search parameters or dates.</p>
         <button className="btn-back" onClick={onReset}>← New Search</button>
@@ -384,7 +403,8 @@ export default function SearchResults({ results, params, loading, error, onReset
   const cheapest = Math.min(...flights.map(f => f.price));
 
   return (
-    <div className="results-page">
+    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
+      <div className="results-page">
       {/* Header */}
       <div className="results-header">
         <button className="btn-back" onClick={onReset}>← Back</button>
@@ -393,6 +413,9 @@ export default function SearchResults({ results, params, loading, error, onReset
           <span>{params?.date}{params?.returnDate ? ` → ${params?.returnDate}` : ''} · {params?.passengers} pax · {params?.cabinClass}</span>
         </div>
         <div className="results-meta">
+          <select className="currency-selector" value={currency} onChange={e => setCurrency(e.target.value)} style={{marginRight: '12px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: 'inherit', border: '1px solid rgba(255,255,255,0.2)'}}>
+            {Object.keys(EXCHANGE_RATES).map(c => <option key={c} value={c} style={{color: '#333'}}>{c}</option>)}
+          </select>
           {flights.length} results · Updated {new Date(results.scraped_at || Date.now()).toLocaleTimeString()}
         </div>
       </div>
@@ -401,7 +424,7 @@ export default function SearchResults({ results, params, loading, error, onReset
       <div className="stats-bar">
         <div className="stat-pill">
           <span className="stat-pl">Cheapest</span>
-          <span className="stat-pv gold">${Number(cheapest).toLocaleString()}</span>
+          <span className="stat-pv gold">{formatPrice(cheapest)}</span>
         </div>
         <div className="stat-pill">
           <span className="stat-pl">Sources</span>
@@ -415,7 +438,7 @@ export default function SearchResults({ results, params, loading, error, onReset
           className={`pipeline-toggle-btn ${showPipeline ? 'active' : ''}`}
           onClick={() => setShowPipeline(!showPipeline)}
         >
-          ⚙️ {showPipeline ? 'Hide' : 'View'} Data Pipeline
+          <Settings size={16} style={{marginRight: 8}} /> {showPipeline ? 'Hide' : 'View'} Data Pipeline
         </button>
       </div>
 
@@ -477,6 +500,7 @@ export default function SearchResults({ results, params, loading, error, onReset
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </CurrencyContext.Provider>
   );
 }

@@ -438,14 +438,48 @@
   text-align: center;
 }
 
-.loading-plane {
-  font-size: 3rem;
-  animation: flyBounce 1.5s ease-in-out infinite;
+.orbit-animation-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
-@keyframes flyBounce {
-  0%, 100% { transform: translateY(0) rotate(-10deg); }
-  50% { transform: translateY(-20px) rotate(5deg); }
+.orbit-globe {
+  color: #3b82f6;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.4));
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.orbit-path {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  animation: orbitRotate 3s linear infinite;
+}
+
+.orbit-plane {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  margin-left: -14px; /* half of plane size to center it */
+  color: #fcd34d;
+  filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.6));
+  transform: rotate(90deg); /* face the direction of the orbit */
+}
+
+@keyframes orbitRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3)); opacity: 0.7; }
+  50% { filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.6)); opacity: 1; transform: scale(1.05); }
 }
 
 .results-loading h2 {

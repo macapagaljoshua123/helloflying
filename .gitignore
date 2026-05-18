@@ -15,3 +15,5 @@ yarn-debug.log*
 yarn-error.log*
 scraper/node_modules/
 *.log
+scraper/*.html
+scraper/*.png
