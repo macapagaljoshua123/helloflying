@@ -3,135 +3,299 @@
     {
       "from": "MNL",
       "to": "SIN",
-      "label": "Manila → Singapore",
-      "price": "$396",
+      "label": "Manila \u00e2\u2020\u2019 Singapore",
+      "price": "$341",
       "is_live": true,
-      "scraped_at": "2026-05-18T03:40:34.017246",
-      "departure_date": "2026-06-01",
+      "scraped_at": "2026-05-20T00:46:12.697065",
+      "departure_date": "2026-06-03",
       "price_trend": "high",
       "airline_breakdown": [
-        {"airline": "Cebu Pacific", "price": "$402"},
-        {"airline": "Scoot", "price": "$417"},
-        {"airline": "Singapore Airlines", "price": "$595"}
+        {
+          "airline": "Malaysia Airlines",
+          "price": "$341"
+        },
+        {
+          "airline": "Scoot / Singapore Airlines",
+          "price": "$365"
+        },
+        {
+          "airline": "Cebu Pacific",
+          "price": "$379"
+        },
+        {
+          "airline": "Singapore Airlines / Philippine Airlines",
+          "price": "$387"
+        }
       ],
       "price_history": [
-        {"date": "May 4", "price": 380},
-        {"date": "May 8", "price": 390},
-        {"date": "May 12", "price": 410},
-        {"date": "May 16", "price": 385},
-        {"date": "May 18", "price": 396}
+        {
+          "date": "May 06",
+          "price": 245
+        },
+        {
+          "date": "May 10",
+          "price": 409
+        },
+        {
+          "date": "May 13",
+          "price": 293
+        },
+        {
+          "date": "May 17",
+          "price": 361
+        },
+        {
+          "date": "May 20",
+          "price": 341
+        }
       ]
     },
     {
       "from": "MNL",
       "to": "HKG",
-      "label": "Manila → Hong Kong",
-      "price": "$227",
+      "label": "Manila \u00e2\u2020\u2019 Hong Kong",
+      "price": "$252",
       "is_live": true,
-      "scraped_at": "2026-05-18T03:41:15.048470",
-      "departure_date": "2026-06-01",
+      "scraped_at": "2026-05-20T00:46:30.845157",
+      "departure_date": "2026-06-03",
       "price_trend": "typical",
       "airline_breakdown": [
-        {"airline": "Hong Kong Express", "price": "$227"},
-        {"airline": "Cebu Pacific", "price": "$235"},
-        {"airline": "Cathay Pacific", "price": "$380"}
+        {
+          "airline": "Cebu Pacific",
+          "price": "$252"
+        },
+        {
+          "airline": "Philippine Airlines",
+          "price": "$291"
+        },
+        {
+          "airline": "Cathay Pacific",
+          "price": "$359"
+        }
       ],
       "price_history": [
-        {"date": "May 4", "price": 240},
-        {"date": "May 8", "price": 220},
-        {"date": "May 12", "price": 230},
-        {"date": "May 16", "price": 215},
-        {"date": "May 18", "price": 227}
+        {
+          "date": "May 06",
+          "price": 181
+        },
+        {
+          "date": "May 10",
+          "price": 302
+        },
+        {
+          "date": "May 13",
+          "price": 216
+        },
+        {
+          "date": "May 17",
+          "price": 267
+        },
+        {
+          "date": "May 20",
+          "price": 252
+        }
       ]
     },
     {
       "from": "MNL",
       "to": "NRT",
-      "label": "Manila → Tokyo",
+      "label": "Manila \u00e2\u2020\u2019 Tokyo",
       "price": "$366",
       "is_live": true,
-      "scraped_at": "2026-05-18T03:41:31.789554",
-      "departure_date": "2026-06-01",
-      "price_trend": "typical",
+      "scraped_at": "2026-05-20T00:46:45.120408",
+      "departure_date": "2026-06-03",
+      "price_trend": "high",
       "airline_breakdown": [
-        {"airline": "Jetstar Japan", "price": "$366"},
-        {"airline": "Cebu Pacific", "price": "$380"},
-        {"airline": "Philippine Airlines", "price": "$520"}
+        {
+          "airline": "Cathay Pacific",
+          "price": "$366"
+        },
+        {
+          "airline": "Cebu Pacific",
+          "price": "$536"
+        },
+        {
+          "airline": "Philippine Airlines / ANA",
+          "price": "$619"
+        },
+        {
+          "airline": "ANA / Philippine Airlines",
+          "price": "$692"
+        }
       ],
       "price_history": [
-        {"date": "May 4", "price": 350},
-        {"date": "May 8", "price": 370},
-        {"date": "May 12", "price": 390},
-        {"date": "May 16", "price": 360},
-        {"date": "May 18", "price": 366}
+        {
+          "date": "May 06",
+          "price": 263
+        },
+        {
+          "date": "May 10",
+          "price": 439
+        },
+        {
+          "date": "May 13",
+          "price": 314
+        },
+        {
+          "date": "May 17",
+          "price": 387
+        },
+        {
+          "date": "May 20",
+          "price": 366
+        }
       ]
     },
     {
       "from": "MNL",
       "to": "DXB",
-      "label": "Manila → Dubai",
-      "price": "$818",
+      "label": "Manila \u00e2\u2020\u2019 Dubai",
+      "price": "$761",
       "is_live": true,
-      "scraped_at": "2026-05-18T03:41:56.589505",
-      "departure_date": "2026-06-01",
+      "scraped_at": "2026-05-20T00:47:00.872828",
+      "departure_date": "2026-06-03",
       "price_trend": "high",
       "airline_breakdown": [
-        {"airline": "Cebu Pacific", "price": "$818"},
-        {"airline": "Gulf Air", "price": "$890"},
-        {"airline": "Emirates", "price": "$1250"}
+        {
+          "airline": "Emirates",
+          "price": "$761"
+        },
+        {
+          "airline": "Gulf Air",
+          "price": "$773"
+        },
+        {
+          "airline": "Philippine Airlines / , SriLankan",
+          "price": "$889"
+        },
+        {
+          "airline": "Oman Air",
+          "price": "$1360"
+        }
       ],
       "price_history": [
-        {"date": "May 4", "price": 790},
-        {"date": "May 8", "price": 810},
-        {"date": "May 12", "price": 840},
-        {"date": "May 16", "price": 800},
-        {"date": "May 18", "price": 818}
+        {
+          "date": "May 06",
+          "price": 547
+        },
+        {
+          "date": "May 10",
+          "price": 913
+        },
+        {
+          "date": "May 13",
+          "price": 654
+        },
+        {
+          "date": "May 17",
+          "price": 806
+        },
+        {
+          "date": "May 20",
+          "price": 761
+        }
       ]
     },
     {
       "from": "MNL",
       "to": "LAX",
-      "label": "Manila → Los Angeles",
-      "price": "$1148",
+      "label": "Manila \u00e2\u2020\u2019 Los Angeles",
+      "price": "$1152",
       "is_live": true,
-      "scraped_at": "2026-05-18T03:42:43.151838",
-      "departure_date": "2026-06-01",
+      "scraped_at": "2026-05-20T00:47:15.105793",
+      "departure_date": "2026-06-03",
       "price_trend": "high",
       "airline_breakdown": [
-        {"airline": "Asiana Airlines", "price": "$1148"},
-        {"airline": "Philippine Airlines", "price": "$1250"},
-        {"airline": "Japan Airlines", "price": "$1400"}
+        {
+          "airline": "STARLUX Airlines",
+          "price": "$1152"
+        },
+        {
+          "airline": "EVA Air",
+          "price": "$1191"
+        },
+        {
+          "airline": "Asiana /  Airlines",
+          "price": "$1317"
+        },
+        {
+          "airline": "JAL",
+          "price": "$1523"
+        }
       ],
       "price_history": [
-        {"date": "May 4", "price": 1100},
-        {"date": "May 8", "price": 1150},
-        {"date": "May 12", "price": 1200},
-        {"date": "May 16", "price": 1130},
-        {"date": "May 18", "price": 1148}
+        {
+          "date": "May 06",
+          "price": 829
+        },
+        {
+          "date": "May 10",
+          "price": 1382
+        },
+        {
+          "date": "May 13",
+          "price": 990
+        },
+        {
+          "date": "May 17",
+          "price": 1221
+        },
+        {
+          "date": "May 20",
+          "price": 1152
+        }
       ]
     },
     {
       "from": "MNL",
       "to": "SYD",
-      "label": "Manila → Sydney",
-      "price": "$637",
+      "label": "Manila \u00e2\u2020\u2019 Sydney",
+      "price": "$691",
       "is_live": true,
-      "scraped_at": "2026-05-18T03:43:06.429658",
-      "departure_date": "2026-06-01",
-      "price_trend": "typical",
+      "scraped_at": "2026-05-20T00:47:28.734593",
+      "departure_date": "2026-06-03",
+      "price_trend": "high",
       "airline_breakdown": [
-        {"airline": "Cebu Pacific", "price": "$637"},
-        {"airline": "Philippine Airlines", "price": "$780"},
-        {"airline": "Qantas", "price": "$950"}
+        {
+          "airline": "Scoot",
+          "price": "$691"
+        },
+        {
+          "airline": "Malaysia Airlines",
+          "price": "$796"
+        },
+        {
+          "airline": "Cathay Pacific",
+          "price": "$817"
+        },
+        {
+          "airline": "Cebu Pacific",
+          "price": "$1028"
+        }
       ],
       "price_history": [
-        {"date": "May 4", "price": 620},
-        {"date": "May 8", "price": 650},
-        {"date": "May 12", "price": 680},
-        {"date": "May 16", "price": 630},
-        {"date": "May 18", "price": 637}
+        {
+          "date": "May 06",
+          "price": 497
+        },
+        {
+          "date": "May 10",
+          "price": 829
+        },
+        {
+          "date": "May 13",
+          "price": 594
+        },
+        {
+          "date": "May 17",
+          "price": 732
+        },
+        {
+          "date": "May 20",
+          "price": 691
+        }
       ]
     }
   ],
-  "last_updated": "2026-05-18T03:43:08.437619"
+  "last_updated": "2026-05-20T00:47:28.735422"
 }
